@@ -2,10 +2,12 @@ package de.createplus.vertretungsplan;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +26,22 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // The filter's action is BROADCAST_ACTION
+        IntentFilter statusIntentFilter = new IntentFilter(
+                UpdatePlanData.Constants.BROADCAST_ACTION);
+
+        // Adds a data filter for the HTTP scheme
+        //statusIntentFilter.addDataScheme("http");
+
+        // Instantiates a new DownloadStateReceiver
+        UpdatePlanDataReceiver mUpdatePlanDataReceiver =
+                new UpdatePlanDataReceiver(this);
+        // Registers the DownloadStateReceiver and its intent filters
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mUpdatePlanDataReceiver,
+                statusIntentFilter);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -36,8 +54,7 @@ public class MainActivity extends AppCompatActivity
                 Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
                 //mServiceIntent.setData(Uri.parse(dataUrl));
                 MainActivity.this.startService(mServiceIntent);
-                Snackbar.make(view, "Reload [WIP]", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+
             }
         });
 
