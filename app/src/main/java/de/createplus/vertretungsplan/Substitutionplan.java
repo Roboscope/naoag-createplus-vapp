@@ -77,7 +77,7 @@ public class Substitutionplan {
         if(SPtoAdd == null || SP ==null){
             return;
         }
-        if(SPtoAdd.get(0).title.equals(SP.get(SP.size()-1))){
+        if(SPtoAdd.get(0).title.equals(SP.get(SP.size()-1).title)){
             for(int i = 0; i < SPtoAdd.get(0).listings.size(); i++){
                 SP.get(SP.size()-1).listings.add(SPtoAdd.get(0).listings.get(i));
             }
@@ -142,10 +142,19 @@ public class Substitutionplan {
     public SPlevel getEntry(int i){
         return SP.get(i);
     }
+
     public void print(){
         for(int i = 0; i < SP.size(); i++){
             SP.get(i).print();
         }
+    }
+
+    public String getPlanSting(){
+        String tmp = "";
+        for(int i = 0; i < SP.size(); i++){
+            tmp = tmp + SP.get(i).getText();
+        }
+        return tmp;
     }
     private String IntToFixString(int i, int fix){
         String tmp = ""+i;

@@ -19,10 +19,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private ContentViews currentContent = ContentViews.OVERVIEW;
+    public String Plan = "Empty";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,10 +152,20 @@ public class MainActivity extends AppCompatActivity
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
         }else if(currentContent == ContentViews.SUBSTITUTIONPLAN){
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
+            TextView text = (TextView) findViewById(R.id.subplan_textfield);
+            text.setText(Plan);
         }else if(currentContent == ContentViews.TIMETABLE){
 
         }else if(currentContent == ContentViews.SETTINGS){
 
         }
+    }
+
+    public String getPlan() {
+        return Plan;
+    }
+
+    public void setPlan(String plan) {
+        Plan = plan;
     }
 }

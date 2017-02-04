@@ -19,4 +19,12 @@ public class SPlevel {
             System.out.println(listings.get(i));
         }
     }
+
+    public String getText(){
+        String tmp = "\n-----------------------------------------------\n"+title;
+        for(int i = 0; i < listings.size(); i++){
+            tmp= tmp + "\n" + listings.get(i);
+        }
+        return tmp;
+    }
 }

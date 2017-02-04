@@ -15,16 +15,19 @@ import android.support.design.widget.Snackbar;
  */
 public class UpdatePlanDataReceiver extends BroadcastReceiver {
     // Prevents instantiation
-    private Activity activity;
+    private MainActivity activity;
 
-    public UpdatePlanDataReceiver(Activity activity) {
+    public UpdatePlanDataReceiver(MainActivity activity) {
         this.activity = activity;
     }
     // Called when the BroadcastReceiver gets an Intent it's registered to receive
     @Override
     public void onReceive(Context context, Intent intent) {
-        Snackbar.make(activity.findViewById(R.id.main_content), intent.getExtras().getString(UpdatePlanData.Constants.EXTENDED_DATA_STATUS), Snackbar.LENGTH_LONG)
+        Snackbar.make(activity.findViewById(R.id.main_content), "DONE", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
+
+        activity.Plan = intent.getExtras().getString(UpdatePlanData.Constants.EXTENDED_DATA_STATUS);
+        activity.updateContainerContent();
 
     }
 }

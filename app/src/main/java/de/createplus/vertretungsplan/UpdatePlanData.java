@@ -33,26 +33,32 @@ public class UpdatePlanData extends IntentService{
     @Override
     protected void onHandleIntent(Intent intent) {
 
-        Substitutionplan SubPlan = new Substitutionplan(1,2,"Schueler","schueler","SuS74!");
+        Substitutionplan SubPlan = new Substitutionplan(1,1,"Schueler","schueler","SuS74!");
         Intent localIntent;
         try{
             SubPlan.update();
             for(int i = 2; i < SubPlan.getMaxPlans()+1; i++){
-                Substitutionplan SubPlanToADD = new Substitutionplan(i,2,"Schueler","schueler","SuS74!");
+                Substitutionplan SubPlanToADD = new Substitutionplan(i,1,"Schueler","schueler","SuS74!");
                 SubPlanToADD.update();
                 SubPlan.add(SubPlanToADD);
             }
+            String tmp =  "";
 
+            if(SubPlan.getDay()==1){
+                tmp="Heute";
+            }else{
+                tmp="Morgen";
+            }
             localIntent =
                     new Intent(Constants.BROADCAST_ACTION)
                             // Puts the status into the Intent
-                            .putExtra(Constants.EXTENDED_DATA_STATUS, "DONE");
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, "Datum: " +SubPlan.getDate() + "   Woche: " + SubPlan.getWeek()+ "  Tag: " + tmp + "\n" + SubPlan.getPlanSting());
         }catch (IOException ex){
 
             localIntent =
                     new Intent(Constants.BROADCAST_ACTION)
                             // Puts the status into the Intent
-                            .putExtra(Constants.EXTENDED_DATA_STATUS, "FAILED");
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, ex.getMessage());
 
         }
 
