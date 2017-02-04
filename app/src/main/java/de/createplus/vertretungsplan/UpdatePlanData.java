@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.io.IOException;
+
 /**
  * TODO: MISSING JAVADOC
  *
@@ -30,12 +32,34 @@ public class UpdatePlanData extends IntentService{
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.e("Test","ICH HABS GESCHAFFT");
 
-        Intent localIntent =
-                new Intent(Constants.BROADCAST_ACTION)
-                        // Puts the status into the Intent
-                        .putExtra(Constants.EXTENDED_DATA_STATUS, "DONE");
+        Substitutionplan SubPlan = new Substitutionplan(1,2,"Schueler","schueler","SuS74!");
+        Intent localIntent;
+        try{
+            SubPlan.update();
+            for(int i = 2; i < SubPlan.getMaxPlans()+1; i++){
+                Substitutionplan SubPlanToADD = new Substitutionplan(i,2,"Schueler","schueler","SuS74!");
+                SubPlanToADD.update();
+                SubPlan.add(SubPlanToADD);
+            }
+
+            localIntent =
+                    new Intent(Constants.BROADCAST_ACTION)
+                            // Puts the status into the Intent
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, "DONE");
+        }catch (IOException ex){
+
+            localIntent =
+                    new Intent(Constants.BROADCAST_ACTION)
+                            // Puts the status into the Intent
+                            .putExtra(Constants.EXTENDED_DATA_STATUS, "FAILED");
+
+        }
+
+
+        //Log.e("Test","ICH HABS GESCHAFFT");
+
+
         // Broadcasts the Intent to receivers in this app.
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }

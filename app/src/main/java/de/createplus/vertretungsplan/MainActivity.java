@@ -27,12 +27,12 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+        //Setup Background Process
+
         // The filter's action is BROADCAST_ACTION
         IntentFilter statusIntentFilter = new IntentFilter(
                 UpdatePlanData.Constants.BROADCAST_ACTION);
-
-        // Adds a data filter for the HTTP scheme
-        //statusIntentFilter.addDataScheme("http");
 
         // Instantiates a new DownloadStateReceiver
         UpdatePlanDataReceiver mUpdatePlanDataReceiver =
@@ -42,11 +42,16 @@ public class MainActivity extends AppCompatActivity
                 mUpdatePlanDataReceiver,
                 statusIntentFilter);
 
+
+
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Setup Fab
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //findViewById(R.id.fab).setVisibility(View.INVISIBLE);
         fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -54,7 +59,6 @@ public class MainActivity extends AppCompatActivity
                 Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
                 //mServiceIntent.setData(Uri.parse(dataUrl));
                 MainActivity.this.startService(mServiceIntent);
-
             }
         });
 
@@ -106,25 +110,20 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        //delete shown content
-        RelativeLayout content = (RelativeLayout) findViewById(R.id.main_content);
-        while(content.getChildCount()>0){
-            content.removeView(content.getChildAt(0));
-        }
 
         //add content
         if (id == R.id.nav_overwiev) {
             currentContent = ContentViews.OVERVIEW;
-            content.addView(getLayoutInflater().inflate(currentContent.getId(),content,false), 0);
+            updateContainerContent();
         } else if (id == R.id.nav_substitutionplan) {
             currentContent = ContentViews.SUBSTITUTIONPLAN;
-            content.addView(getLayoutInflater().inflate(currentContent.getId(),content,false), 0);
+            updateContainerContent();
         } else if (id == R.id.nav_timetable) {
             currentContent = ContentViews.TIMETABLE;
-            content.addView(getLayoutInflater().inflate(currentContent.getId(),content,false), 0);
+            updateContainerContent();
         } else if (id == R.id.nav_settings) {
             currentContent = ContentViews.SETTINGS;
-            content.addView(getLayoutInflater().inflate(currentContent.getId(),content,false), 0);
+            updateContainerContent();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
@@ -134,5 +133,27 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+
+    public void updateContainerContent(){
+        //reset Container
+        RelativeLayout content = (RelativeLayout) findViewById(R.id.main_content);
+        while(content.getChildCount()>0){
+            content.removeView(content.getChildAt(0));
+        }
+        findViewById(R.id.fab).setVisibility(View.INVISIBLE);
+
+        //update Container
+        content.addView(getLayoutInflater().inflate(currentContent.getId(),content,false), 0);
+        if(currentContent == ContentViews.OVERVIEW){
+            findViewById(R.id.fab).setVisibility(View.VISIBLE);
+        }else if(currentContent == ContentViews.SUBSTITUTIONPLAN){
+            findViewById(R.id.fab).setVisibility(View.VISIBLE);
+        }else if(currentContent == ContentViews.TIMETABLE){
+
+        }else if(currentContent == ContentViews.SETTINGS){
+
+        }
     }
 }

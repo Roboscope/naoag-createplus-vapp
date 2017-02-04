@@ -23,7 +23,7 @@ public class UpdatePlanDataReceiver extends BroadcastReceiver {
     // Called when the BroadcastReceiver gets an Intent it's registered to receive
     @Override
     public void onReceive(Context context, Intent intent) {
-        Snackbar.make(activity.findViewById(R.id.main_content), "Reload [WIP]", Snackbar.LENGTH_LONG)
+        Snackbar.make(activity.findViewById(R.id.main_content), intent.getExtras().getString(UpdatePlanData.Constants.EXTENDED_DATA_STATUS), Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
 
     }
