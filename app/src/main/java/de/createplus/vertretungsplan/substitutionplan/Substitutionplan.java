@@ -1,4 +1,4 @@
-package de.createplus.vertretungsplan;
+package de.createplus.vertretungsplan.substitutionplan;
 
 import org.apache.commons.codec.binary.Base64;
 import org.jsoup.Jsoup;
@@ -33,6 +33,7 @@ public class Substitutionplan {
     }
 
     public void update() throws IOException {
+
         //System.out.println("URL: " + url);
         //System.out.println("Downloading page...");
         String base64login = new String(Base64.encodeBase64((username + ":" + password).getBytes())); // creating an encoded login

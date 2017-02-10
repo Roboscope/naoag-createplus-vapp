@@ -2,12 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Vertretungsplan.iml" filepath="$PROJECT_DIR$/.idea/modules/Vertretungsplan.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Vertretungsplan2.0.iml" filepath="$PROJECT_DIR$/Vertretungsplan2.0.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Vertretungsplan.iml" filepath="$PROJECT_DIR$/Vertretungsplan.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/commons-codec-1.10/commons-codec-1.10.iml" filepath="$PROJECT_DIR$/commons-codec-1.10/commons-codec-1.10.iml" />
-      <module fileurl="file://$PROJECT_DIR$/commons-codec-1.10/commons-codec-1.10.iml" filepath="$PROJECT_DIR$/commons-codec-1.10/commons-codec-1.10.iml" />
     </modules>
   </component>
 </project>

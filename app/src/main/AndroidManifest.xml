@@ -21,7 +21,7 @@
         </activity>
 
         <service
-                android:name=".UpdatePlanData"
+                android:name=".backgroundservices.UpdatePlanData"
                 android:exported="false"/>
 
     </application>

@@ -1,12 +1,9 @@
 package de.createplus.vertretungsplan;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,9 +14,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import de.createplus.vertretungsplan.backgroundservices.SPDownloader;
+import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
+import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
+import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity
                 mUpdatePlanDataReceiver,
                 statusIntentFilter);
 
-
+        SPDatabaseHelper SPDbHelper = new SPDatabaseHelper(this);
 
 
         setContentView(R.layout.activity_main);
@@ -153,7 +153,9 @@ public class MainActivity extends AppCompatActivity
         }else if(currentContent == ContentViews.SUBSTITUTIONPLAN){
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
             TextView text = (TextView) findViewById(R.id.subplan_textfield);
-            text.setText(Plan);
+            SPDatabaseHelper db = new SPDatabaseHelper(this);
+
+            text.setText(db.test());
         }else if(currentContent == ContentViews.TIMETABLE){
 
         }else if(currentContent == ContentViews.SETTINGS){

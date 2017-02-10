@@ -1,10 +1,12 @@
-package de.createplus.vertretungsplan;
+package de.createplus.vertretungsplan.backgroundservices;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
+import de.createplus.vertretungsplan.MainActivity;
+import de.createplus.vertretungsplan.R;
+import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 
 /**
  * TODO: MISSING JAVADOC
@@ -28,6 +30,5 @@ public class UpdatePlanDataReceiver extends BroadcastReceiver {
 
         activity.Plan = intent.getExtras().getString(UpdatePlanData.Constants.EXTENDED_DATA_STATUS);
         activity.updateContainerContent();
-
     }
 }

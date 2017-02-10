@@ -1,4 +1,4 @@
-package de.createplus.vertretungsplan;
+package de.createplus.vertretungsplan.substitutionplan;
 
 import java.util.LinkedList;
 import java.util.List;
