@@ -25,6 +25,6 @@ public class SPContract {
         public static final String COLUMN_NAME_TEXT = "text";
         public static final String COLUMN_NAME_CLASS = "class";
         public static final String COLUMN_NAME_COURSE = "course";
-        public static final String COLUMN_NAME_TEACHER = "teacher";
+        public static final String COLUMN_NAME_PLANINFO = "planinfo";
     }
 }

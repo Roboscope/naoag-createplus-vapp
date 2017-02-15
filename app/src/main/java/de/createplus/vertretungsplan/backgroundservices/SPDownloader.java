@@ -26,7 +26,8 @@ import java.util.regex.Pattern;
 public class SPDownloader {
     private static final String URL_ARCHIVE = "http://gymnasium-wuerselen.de/untis/";
 
-    public static boolean download(int index, int day, String user, String username, String password, Context context) {
+    public static int download(int index, int day, String user, String username, String password, Context context) {
+        String info = "";
         try {
             String url = URL_ARCHIVE + user + "/f" + day + "/" + "subst_" + IntToFixString(index, 3) + ".htm";
             String base64login = new String(Base64.encodeBase64((username + ":" + password).getBytes())); // creating an encoded login
@@ -36,36 +37,38 @@ public class SPDownloader {
 
             String htmlraw = doc.html(); // get raw html
             String[] htmlsplit = htmlraw.split("\\n"); // split raw html -> lines of the file in an array
-            String info = htmlsplit[88].replace("<div class=\"mon_title\">", "").replace("</div>", ""); // get level information
+            info = htmlsplit[88].replace("<div class=\"mon_title\">", "").replace("</div>", ""); // get level information
 
 
             org.jsoup.select.Elements rows = doc.select("tr");
             List<String> planList = new LinkedList<String>();
             String title = "";
-            SPDbHelper.removeAll();
+
             for (org.jsoup.nodes.Element row : rows) {
 
                 int i = 0;
                 String[] data = new String[7];
                 org.jsoup.select.Elements columns = row.select("td");
                 for (org.jsoup.nodes.Element column : columns) {
-                    if (Pattern.matches("[^ ]+ [^ -]+-[^ -]+-[^ -]+", column.text()) || Pattern.matches(" [^ ]+", column.text())) {
-                        title = column.text();
-                    } else {
+                    //if (Pattern.matches("[^ ]+ [^ -]+-[^ -]+-[^ -]+", column.text()) || Pattern.matches(" [^ ]+", column.text())) {
+                    //    title = column.text();
+                    //} else {
                         data[i] = column.text();
                         i++;
-                    }
+                    //}
                 }
                 if (data[6] != null) {
-                    Log.e("VERTRETUNGSPLAN", title + Arrays.toString(data));
-                    SPDbHelper.addLine(title, data);
+                    //Log.e("VERTRETUNGSPLAN", title);
+                    SPDbHelper.addLine(title, data, info);
+                }else if(data[1] == null){
+                    title = data[0];
                 }
 
             }
         } catch (IOException e) {
-            return false;
-        }
-        return true;
+            //Log.e("VERTRETUNGSPLAN", e.toString());
+            return -1;
+        }return getMaxPlans(info);
 
 
     }
@@ -102,7 +105,7 @@ public class SPDownloader {
         Matcher m = Pattern.compile("\\(Seite [0-9]+ \\/ [0-9]+\\)").matcher(info);
         if (m.find()) {
             tmp = m.group();
-        } else return 0;
+        } else return -1;
         tmp = tmp.replace(" ", "");
         return Integer.parseInt(tmp.substring(tmp.indexOf("/") + 1, tmp.indexOf(")")));
     }

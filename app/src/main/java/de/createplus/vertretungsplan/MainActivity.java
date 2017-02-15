@@ -5,6 +5,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,22 +15,51 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import de.createplus.vertretungsplan.backgroundservices.SPDownloader;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
+import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private ContentViews currentContent = ContentViews.OVERVIEW;
-    public String Plan = "Empty";
+    private int CurrentShown = 1;
+    public String TodayDate = "*ERROR*";
+    public String TomorrowDate = "*ERROR*";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*Calendar c = Calendar.getInstance();
+        System.out.println("Current time => " + c.getTime());
 
+        SimpleDateFormat df = new SimpleDateFormat("dd.MMM.yyyy");
+        String formattedDate = df.format(c.getTime());
+        Log.e("DATE", formattedDate);*/
+        Calendar calander = Calendar.getInstance();
+
+        int cDay = calander.get(Calendar.DAY_OF_MONTH);
+        int cMonth = calander.get(Calendar.MONTH) + 1;
+        int cYear = calander.get(Calendar.YEAR);
+        TodayDate = cDay+"."+cMonth+"."+cYear;
+
+        calander.add(Calendar.DATE,1);
+
+        cDay = calander.get(Calendar.DAY_OF_MONTH);
+        cMonth = calander.get(Calendar.MONTH) + 1;
+        cYear = calander.get(Calendar.YEAR);
+        TomorrowDate = cDay+"."+cMonth+"."+cYear;
+        //Log.e("DATE", cDay+"."+cMonth+"."+cYear);
         //Setup Background Process
 
         // The filter's action is BROADCAST_ACTION
@@ -63,6 +93,8 @@ public class MainActivity extends AppCompatActivity
                 MainActivity.this.startService(mServiceIntent);
             }
         });
+
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -152,10 +184,41 @@ public class MainActivity extends AppCompatActivity
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
         }else if(currentContent == ContentViews.SUBSTITUTIONPLAN){
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
-            TextView text = (TextView) findViewById(R.id.subplan_textfield);
+            ExpandableListView mExpandableList = (ExpandableListView)findViewById(R.id.expandable_list);
             SPDatabaseHelper db = new SPDatabaseHelper(this);
+            if(CurrentShown == 1){
+                mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TodayDate)));
+                mExpandableList.setVisibility(View.VISIBLE);
+            }else {
+                mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TomorrowDate)));
+                mExpandableList.setVisibility(View.VISIBLE);
+            }
 
-            text.setText(db.test());
+            //Setup SPPlan Toggle Button
+            final Button SW = (Button) findViewById(R.id.sw);
+
+            if(CurrentShown == 1)SW.setText(TodayDate);
+            else SW.setText(TomorrowDate);
+
+            SW.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if (CurrentShown == 1) {
+                        CurrentShown = 2;
+                        SW.setText(TomorrowDate);
+                        updateContainerContent();
+                    } else {
+
+                        SW.setText(TodayDate);
+                        CurrentShown = 1;
+                        updateContainerContent();
+                    }
+                }
+            });
+
+            //TextView text = (TextView) findViewById(R.id.subplan_textfield);
+            //SPDatabaseHelper db = new SPDatabaseHelper(this);
+
+            //text.setText(db.test());
         }else if(currentContent == ContentViews.TIMETABLE){
 
         }else if(currentContent == ContentViews.SETTINGS){
@@ -163,11 +226,4 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public String getPlan() {
-        return Plan;
-    }
-
-    public void setPlan(String plan) {
-        Plan = plan;
-    }
 }
