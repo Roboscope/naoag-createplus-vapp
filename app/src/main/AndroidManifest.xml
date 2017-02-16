@@ -20,6 +20,13 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".settings.SettingsActivity"
+            android:label="Einstellungen"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+
         <service
                 android:name=".backgroundservices.UpdatePlanData"
                 android:exported="false"/>

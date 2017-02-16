@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:key="pref_key_login_settings"
+        android:title="Login">
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_sync"
+            android:summary="Anmeldedaten speichern?"
+            android:title="Speichern" />
+
+        <PreferenceScreen
+            android:key="button_voicemail_setting_key"
+            android:persistent="false"
+            android:title="Logins">
+
+            <PreferenceCategory
+                android:key="pref_key_studentlogin_settings"
+                android:title="Schüler">
+                <EditTextPreference
+                    android:key="pref_key_studentloginbne_limit"
+                    android:summary="Passwort"
+                    android:inputType="textPassword"
+                    android:title="" />
+                <EditTextPreference
+                    android:key="pref_key_sutdetloginpw_limit"
+                    android:summary="Benutzername"
+                    android:title="" />
+            </PreferenceCategory>
+            <PreferenceCategory
+                android:key="pref_key_teacherlogin_settings"
+                android:title="Lehrer">
+                <CheckBoxPreference
+                    android:defaultValue="false"
+                    android:key="pref_key_auto_delete"
+                    android:summary="Lehrer Modus"
+                    android:title="Lehrer Modus Aktivieren?" />
+                <EditTextPreference
+                    android:dependency="pref_key_auto_delete"
+                    android:key="pref_key_sms_delete_limit"
+                    android:summary="Passwort"
+                    android:inputType="textPassword"
+                    android:title="" />
+                <EditTextPreference
+                    android:dependency="pref_key_auto_delete"
+                    android:key="pref_key_mms_delete_limit"
+                    android:summary="Benutzername"
+                    android:title="" />
+            </PreferenceCategory>
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_key_timetable_settings"
+        android:title="Stundenplan">
+
+
+        <PreferenceScreen
+            android:key="button_timetable_setting_key"
+            android:persistent="false"
+            android:title="Kurse">
+
+            <ListPreference     android:title="Download Details"
+                android:summary="Select the kind of data that you would like to download"
+                android:key="downloadType"
+                android:defaultValue="1"
+                android:entries="@array/listArray"
+                android:entryValues="@array/listValues" />
+
+        </PreferenceScreen>
+        <Preference
+            android:key="pref_key_class_limit"
+
+            android:summary="Stufe"
+            android:title="" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

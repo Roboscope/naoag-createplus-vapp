@@ -33,10 +33,11 @@ import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
 import de.createplus.vertretungsplan.listview.MyCustomAdapter;
+import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    static private ContentViews currentContent = ContentViews.OVERVIEW;
+    static private ContentViews currentContent = ContentViews.SUBSTITUTIONPLAN;
 
 
     static private int CurrentShown = 1;
@@ -123,6 +124,27 @@ public class MainActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+/*
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.nav_overwiev).setChecked(false);
+        menu.findItem(R.id.nav_timetable).setChecked(false);
+        menu.findItem(R.id.nav_substitutionplan).setChecked(false);
+        menu.findItem(R.id.nav_settings).setChecked(false);
+
+        switch(currentContent){
+            case OVERVIEW: menu.findItem(R.id.nav_overwiev).setChecked(true);
+                break;
+            case TIMETABLE: menu.findItem(R.id.nav_timetable).setChecked(true);
+                break;
+            case SUBSTITUTIONPLAN: menu.findItem(R.id.nav_substitutionplan).setChecked(true);
+                break;
+            case SETTINGS: menu.findItem(R.id.nav_settings).setChecked(true);
+                break;
+        }
+        return true;
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -158,6 +180,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_settings) {
             currentContent = ContentViews.SETTINGS;
             updateContainerContent();
+            Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
+            //myIntent.putExtra("key", value); //Optional parameters
+            MainActivity.this.startActivity(myIntent);
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
