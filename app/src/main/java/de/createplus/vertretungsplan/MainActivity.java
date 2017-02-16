@@ -1,9 +1,14 @@
 package de.createplus.vertretungsplan;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -31,21 +36,18 @@ import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    private ContentViews currentContent = ContentViews.OVERVIEW;
-    private int CurrentShown = 1;
-    public String TodayDate = "*ERROR*";
-    public String TomorrowDate = "*ERROR*";
+    static private ContentViews currentContent = ContentViews.OVERVIEW;
+
+
+    static private int CurrentShown = 1;
+    static public String TodayDate = "*ERROR*";
+    static public String TomorrowDate = "*ERROR*";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*Calendar c = Calendar.getInstance();
-        System.out.println("Current time => " + c.getTime());
-
-        SimpleDateFormat df = new SimpleDateFormat("dd.MMM.yyyy");
-        String formattedDate = df.format(c.getTime());
-        Log.e("DATE", formattedDate);*/
         Calendar calander = Calendar.getInstance();
 
         int cDay = calander.get(Calendar.DAY_OF_MONTH);
@@ -59,8 +61,7 @@ public class MainActivity extends AppCompatActivity
         cMonth = calander.get(Calendar.MONTH) + 1;
         cYear = calander.get(Calendar.YEAR);
         TomorrowDate = cDay+"."+cMonth+"."+cYear;
-        //Log.e("DATE", cDay+"."+cMonth+"."+cYear);
-        //Setup Background Process
+
 
         // The filter's action is BROADCAST_ACTION
         IntentFilter statusIntentFilter = new IntentFilter(
@@ -83,13 +84,11 @@ public class MainActivity extends AppCompatActivity
 
         //Setup Fab
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        //findViewById(R.id.fab).setVisibility(View.INVISIBLE);
         fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
                 Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
-                //mServiceIntent.setData(Uri.parse(dataUrl));
                 MainActivity.this.startService(mServiceIntent);
             }
         });
@@ -104,6 +103,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        updateContainerContent();
     }
 
     @Override
@@ -144,7 +145,6 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-
         //add content
         if (id == R.id.nav_overwiev) {
             currentContent = ContentViews.OVERVIEW;
@@ -171,6 +171,7 @@ public class MainActivity extends AppCompatActivity
 
 
     public void updateContainerContent(){
+        //Log.e("UPDATE CONTENT", "Updating to: " + currentContent);
         //reset Container
         RelativeLayout content = (RelativeLayout) findViewById(R.id.main_content);
         while(content.getChildCount()>0){
@@ -225,5 +226,20 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
+    private void addNotification() {
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.drawable.ic_menu_gallery)
+                        .setContentTitle("Notifications Example")
+                        .setContentText("This is a test notification");
 
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(0, builder.build());
+    }
 }

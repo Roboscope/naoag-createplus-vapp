@@ -66,7 +66,7 @@ public class SPDownloader {
 
             }
         } catch (IOException e) {
-            //Log.e("VERTRETUNGSPLAN", e.toString());
+            Log.e("DOWNLOAD ERROR: ", "E: "+e.toString());
             return -1;
         }return getMaxPlans(info);
 
@@ -105,7 +105,7 @@ public class SPDownloader {
         Matcher m = Pattern.compile("\\(Seite [0-9]+ \\/ [0-9]+\\)").matcher(info);
         if (m.find()) {
             tmp = m.group();
-        } else return -1;
+        } else return 1;
         tmp = tmp.replace(" ", "");
         return Integer.parseInt(tmp.substring(tmp.indexOf("/") + 1, tmp.indexOf(")")));
     }

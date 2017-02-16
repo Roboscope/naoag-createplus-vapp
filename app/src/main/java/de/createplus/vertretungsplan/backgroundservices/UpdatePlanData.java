@@ -52,8 +52,10 @@ public class UpdatePlanData extends IntentService {
             }
         }
 
+        //Log.e("VERTRETINGSPLAN",""+maxplans);
         Intent localIntent;
         if(maxplans > 0){
+            //Log.e("VERTRETINGSPLAN","DONE");
             localIntent = new Intent(Constants.BROADCAST_ACTION)
                     .putExtra(Constants.EXTENDED_DATA_STATUS, "DONE");
         }else{
