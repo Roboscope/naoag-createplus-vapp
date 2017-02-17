@@ -46,27 +46,27 @@ public class MainActivity extends AppCompatActivity
     static private int CurrentShown = 1;
     static public String TodayDate = "*ERROR*";
     static public String TomorrowDate = "*ERROR*";
-
+    static final private int INTERNET_REQUEST_CODE = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        askForPermission(INTERNET, 1);
+        askForPermission(INTERNET, INTERNET_REQUEST_CODE);
 
         Calendar calander = Calendar.getInstance();
 
         int cDay = calander.get(Calendar.DAY_OF_MONTH);
         int cMonth = calander.get(Calendar.MONTH) + 1;
         int cYear = calander.get(Calendar.YEAR);
-        TodayDate = cDay+"."+cMonth+"."+cYear;
+        TodayDate = cDay + "." + cMonth + "." + cYear;
 
-        calander.add(Calendar.DATE,1);
+        calander.add(Calendar.DATE, 1);
 
         cDay = calander.get(Calendar.DAY_OF_MONTH);
         cMonth = calander.get(Calendar.MONTH) + 1;
         cYear = calander.get(Calendar.YEAR);
-        TomorrowDate = cDay+"."+cMonth+"."+cYear;
+        TomorrowDate = cDay + "." + cMonth + "." + cYear;
 
 
         // The filter's action is BROADCAST_ACTION
@@ -98,7 +98,6 @@ public class MainActivity extends AppCompatActivity
                 MainActivity.this.startService(mServiceIntent);
             }
         });
-
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -219,22 +218,22 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void updateContainerContent(){
+    public void updateContainerContent() {
         //Log.e("UPDATE CONTENT", "Updating to: " + currentContent);
         //reset Container
         RelativeLayout content = (RelativeLayout) findViewById(R.id.main_content);
-        while(content.getChildCount()>0){
+        while (content.getChildCount() > 0) {
             content.removeView(content.getChildAt(0));
         }
         findViewById(R.id.fab).setVisibility(View.INVISIBLE);
 
         //update Container
-        content.addView(getLayoutInflater().inflate(currentContent.getId(),content,false), 0);
-        if(currentContent == ContentViews.OVERVIEW){
+        content.addView(getLayoutInflater().inflate(currentContent.getId(), content, false), 0);
+        if (currentContent == ContentViews.OVERVIEW) {
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
-        }else if(currentContent == ContentViews.SUBSTITUTIONPLAN){
+        } else if (currentContent == ContentViews.SUBSTITUTIONPLAN) {
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
-            ExpandableListView mExpandableList = (ExpandableListView)findViewById(R.id.expandable_list);
+            ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
             //SPDatabaseHelper db = new SPDatabaseHelper(this);
             /*if(CurrentShown == 1){
                 mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TodayDate)));
@@ -247,7 +246,7 @@ public class MainActivity extends AppCompatActivity
             //Setup SPPlan Toggle Button
             final Button SW = (Button) findViewById(R.id.sw);
 
-            if(CurrentShown == 1)SW.setText(TodayDate);
+            if (CurrentShown == 1) SW.setText(TodayDate);
             else SW.setText(TomorrowDate);
 
             SW.setOnClickListener(new View.OnClickListener() {
@@ -269,12 +268,13 @@ public class MainActivity extends AppCompatActivity
             //SPDatabaseHelper db = new SPDatabaseHelper(this);
 
             //text.setText(db.test());
-        }else if(currentContent == ContentViews.TIMETABLE){
+        } else if (currentContent == ContentViews.TIMETABLE) {
 
-        }else if(currentContent == ContentViews.SETTINGS){
+        } else if (currentContent == ContentViews.SETTINGS) {
 
         }
     }
+
     private void addNotification() {
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
