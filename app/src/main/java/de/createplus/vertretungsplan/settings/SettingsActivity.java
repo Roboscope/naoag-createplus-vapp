@@ -42,6 +42,8 @@ public class SettingsActivity extends PreferenceActivity {
                 finish();
             }
         });
+        bar.setTitleTextColor(Color.WHITE);
+
     }
 
 
@@ -74,7 +76,7 @@ public class SettingsActivity extends PreferenceActivity {
             root.removeAllViews();
 
             bar = (Toolbar) LayoutInflater.from(this).inflate(R.xml.settings_toolbar, root, false);
-            bar.setTitleTextColor(Color.WHITE);
+
             int height;
             TypedValue tv = new TypedValue();
             if (getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
@@ -87,6 +89,7 @@ public class SettingsActivity extends PreferenceActivity {
 
             root.addView(content);
             root.addView(bar);
+
         }
 
         bar.setTitle(preferenceScreen.getTitle());
