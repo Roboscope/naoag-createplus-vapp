@@ -1,13 +1,17 @@
 package de.createplus.vertretungsplan;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -46,13 +50,17 @@ public class MainActivity extends AppCompatActivity
     static private int CurrentShown = 1;
     static public String TodayDate = "*ERROR*";
     static public String TomorrowDate = "*ERROR*";
-    static final private int INTERNET_REQUEST_CODE = 0;
+    static final private int INTERNET_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         askForPermission(INTERNET, INTERNET_REQUEST_CODE);
+
+        while(){
+
+        }
 
         Calendar calander = Calendar.getInstance();
 
@@ -128,6 +136,27 @@ public class MainActivity extends AppCompatActivity
             }
         } else {
             Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED){
+            switch (requestCode) {
+                //Internet
+                case 1:
+                    Intent IneternetIntent = new Intent(Intent.INETRNET);
+                    callIntent.setData(Uri.parse("tel:" + "{This is a telephone number}"));
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                        startActivity(callIntent);
+                    }
+                    break;
+            }
+
+            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
         }
     }
 
