@@ -1,8 +1,13 @@
 package de.createplus.vertretungsplan.settings;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 
+import android.preference.PreferenceScreen;
 import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -60,7 +65,7 @@ public class SettingsActivity extends PreferenceActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
             LinearLayout root = (LinearLayout) dialog.findViewById(android.R.id.list).getParent();
-            bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
+            bar = (Toolbar) LayoutInflater.from(this).inflate(R.xml.settings_toolbar, root, false);
             root.addView(bar, 0); // insert at top
         } else {
             ViewGroup root = (ViewGroup) dialog.findViewById(android.R.id.content);
@@ -68,8 +73,8 @@ public class SettingsActivity extends PreferenceActivity {
 
             root.removeAllViews();
 
-            bar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.settings_toolbar, root, false);
-
+            bar = (Toolbar) LayoutInflater.from(this).inflate(R.xml.settings_toolbar, root, false);
+            bar.setTitleTextColor(Color.WHITE);
             int height;
             TypedValue tv = new TypedValue();
             if (getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
