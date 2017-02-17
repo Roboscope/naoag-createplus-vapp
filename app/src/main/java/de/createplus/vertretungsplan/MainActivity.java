@@ -32,7 +32,7 @@ import java.util.Calendar;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
-import de.createplus.vertretungsplan.listview.MyCustomAdapter;
+//import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity
@@ -211,14 +211,14 @@ public class MainActivity extends AppCompatActivity
         }else if(currentContent == ContentViews.SUBSTITUTIONPLAN){
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
             ExpandableListView mExpandableList = (ExpandableListView)findViewById(R.id.expandable_list);
-            SPDatabaseHelper db = new SPDatabaseHelper(this);
-            if(CurrentShown == 1){
+            //SPDatabaseHelper db = new SPDatabaseHelper(this);
+            /*if(CurrentShown == 1){
                 mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TodayDate)));
                 mExpandableList.setVisibility(View.VISIBLE);
             }else {
                 mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TomorrowDate)));
                 mExpandableList.setVisibility(View.VISIBLE);
-            }
+            }*/
 
             //Setup SPPlan Toggle Button
             final Button SW = (Button) findViewById(R.id.sw);
