@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
+   /* @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED){
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity
         }else{
             Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
     @Override
     public void onBackPressed() {
