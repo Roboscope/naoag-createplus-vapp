@@ -9,7 +9,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import de.createplus.vertretungsplan.listview.Parent;
+//import de.createplus.vertretungsplan.listview.Parent;
 
 /**
  * Created by maxnu on 04.02.2017.
@@ -115,7 +115,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-
+/*
     public ArrayList<Parent> getPlan(String date) {
         String[] projection = {
                 SPContract.SPEntry.COLUMN_NAME_CLASS,
@@ -197,7 +197,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return arrayParents;
-    }
+    }*/
 
 
 }
