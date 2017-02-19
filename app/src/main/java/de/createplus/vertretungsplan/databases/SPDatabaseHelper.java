@@ -9,7 +9,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-//import de.createplus.vertretungsplan.listview.Parent;
+import de.createplus.vertretungsplan.listview.Parent;
+
 
 /**
  * Created by maxnu on 04.02.2017.
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 
 public class SPDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "substitutionplan.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + SPContract.SPEntry.TABLE_NAME + " (" +
@@ -115,7 +116,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
         return result;
     }
 
-/*
+
     public ArrayList<Parent> getPlan(String date) {
         String[] projection = {
                 SPContract.SPEntry.COLUMN_NAME_CLASS,
@@ -168,7 +169,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
                         PLANINFO = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_PLANINFO));
                 String[] CLASSSPLIT = CLASS.split(" ");
                 CLASS = CLASSSPLIT[CLASSSPLIT.length-1];
-                //Log.e("VERTRETUNGSPLAN", DATE);
+                Log.e("VERTRETUNGSPLAN", ""+DATE);
                 //Log.e("VERTRETUNGSPLANPARENT", currentparent.getTitle());
                 if (currentparent == null) {
                     currentparent = new Parent();
@@ -197,7 +198,6 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return arrayParents;
-    }*/
-
+    }
 
 }

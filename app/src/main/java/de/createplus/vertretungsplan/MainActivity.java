@@ -38,6 +38,7 @@ import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
 //import de.createplus.vertretungsplan.listview.MyCustomAdapter;
+import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 import static android.Manifest.permission.INTERNET;
@@ -49,18 +50,14 @@ public class MainActivity extends AppCompatActivity
 
     static private int CurrentShown = 1;
     static public String TodayDate = "*ERROR*";
+    static public String TodayDateString = "*ERROR*";
     static public String TomorrowDate = "*ERROR*";
+    static public String TomorrowDateString = "*ERROR*";
     static final private int INTERNET_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        askForPermission(INTERNET, INTERNET_REQUEST_CODE);
-
-        while(){
-
-        }
 
         Calendar calander = Calendar.getInstance();
 
@@ -68,8 +65,12 @@ public class MainActivity extends AppCompatActivity
         int cMonth = calander.get(Calendar.MONTH) + 1;
         int cYear = calander.get(Calendar.YEAR);
         TodayDate = cDay + "." + cMonth + "." + cYear;
-
+        Log.e("DATE", "" + calander.get(Calendar.DAY_OF_WEEK));
         calander.add(Calendar.DATE, 1);
+        while (!(calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY)){
+            calander.add(Calendar.DATE, 1);
+            Log.e("DATE", "added to:" + calander.get(Calendar.DAY_OF_WEEK));
+        }
 
         cDay = calander.get(Calendar.DAY_OF_MONTH);
         cMonth = calander.get(Calendar.MONTH) + 1;
@@ -88,8 +89,6 @@ public class MainActivity extends AppCompatActivity
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mUpdatePlanDataReceiver,
                 statusIntentFilter);
-
-        SPDatabaseHelper SPDbHelper = new SPDatabaseHelper(this);
 
 
         setContentView(R.layout.activity_main);
@@ -120,45 +119,6 @@ public class MainActivity extends AppCompatActivity
         updateContainerContent();
     }
 
-    private void askForPermission(String permission, Integer requestCode) {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
-
-                //This is called if user has denied the permission before
-                //In this case I am just asking the permission again
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-
-            } else {
-
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-            }
-        } else {
-            Toast.makeText(this, "" + permission + " is already granted.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-   /* @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if(ActivityCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_GRANTED){
-            switch (requestCode) {
-                //Internet
-                case 1:
-                    Intent IneternetIntent = new Intent(Intent.INETRNET);
-                    callIntent.setData(Uri.parse("tel:" + "{This is a telephone number}"));
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                        startActivity(callIntent);
-                    }
-                    break;
-            }
-
-            Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
-        }else{
-            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-        }
-    }*/
 
     @Override
     public void onBackPressed() {
@@ -176,27 +136,7 @@ public class MainActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
-/*
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.nav_overwiev).setChecked(false);
-        menu.findItem(R.id.nav_timetable).setChecked(false);
-        menu.findItem(R.id.nav_substitutionplan).setChecked(false);
-        menu.findItem(R.id.nav_settings).setChecked(false);
 
-        switch(currentContent){
-            case OVERVIEW: menu.findItem(R.id.nav_overwiev).setChecked(true);
-                break;
-            case TIMETABLE: menu.findItem(R.id.nav_timetable).setChecked(true);
-                break;
-            case SUBSTITUTIONPLAN: menu.findItem(R.id.nav_substitutionplan).setChecked(true);
-                break;
-            case SETTINGS: menu.findItem(R.id.nav_settings).setChecked(true);
-                break;
-        }
-        return true;
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -230,10 +170,7 @@ public class MainActivity extends AppCompatActivity
             currentContent = ContentViews.TIMETABLE;
             updateContainerContent();
         } else if (id == R.id.nav_settings) {
-            currentContent = ContentViews.SETTINGS;
-            updateContainerContent();
             Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
-            //myIntent.putExtra("key", value); //Optional parameters
             MainActivity.this.startActivity(myIntent);
         } else if (id == R.id.nav_share) {
 
@@ -258,19 +195,22 @@ public class MainActivity extends AppCompatActivity
 
         //update Container
         content.addView(getLayoutInflater().inflate(currentContent.getId(), content, false), 0);
+
         if (currentContent == ContentViews.OVERVIEW) {
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
+
+
         } else if (currentContent == ContentViews.SUBSTITUTIONPLAN) {
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
             ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
-            //SPDatabaseHelper db = new SPDatabaseHelper(this);
-            /*if(CurrentShown == 1){
+            SPDatabaseHelper db = new SPDatabaseHelper(this);
+            if (CurrentShown == 1) {
                 mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TodayDate)));
                 mExpandableList.setVisibility(View.VISIBLE);
-            }else {
+            } else {
                 mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TomorrowDate)));
                 mExpandableList.setVisibility(View.VISIBLE);
-            }*/
+            }
 
             //Setup SPPlan Toggle Button
             final Button SW = (Button) findViewById(R.id.sw);
@@ -292,11 +232,9 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             });
+            db.close();
 
-            //TextView text = (TextView) findViewById(R.id.subplan_textfield);
-            //SPDatabaseHelper db = new SPDatabaseHelper(this);
 
-            //text.setText(db.test());
         } else if (currentContent == ContentViews.TIMETABLE) {
 
         } else if (currentContent == ContentViews.SETTINGS) {
