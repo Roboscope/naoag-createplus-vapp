@@ -169,7 +169,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
                         PLANINFO = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_PLANINFO));
                 String[] CLASSSPLIT = CLASS.split(" ");
                 CLASS = CLASSSPLIT[CLASSSPLIT.length-1];
-                Log.e("VERTRETUNGSPLAN", ""+DATE);
+                //Log.e("VERTRETUNGSPLAN", ""+DATE);
                 //Log.e("VERTRETUNGSPLANPARENT", currentparent.getTitle());
                 if (currentparent == null) {
                     currentparent = new Parent();

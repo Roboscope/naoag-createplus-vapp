@@ -14,11 +14,11 @@
         tools:context="de.createplus.vertretungsplan.MainActivity">
 
 
-    <!--<TextView
+    <TextView
         android:id="@+id/subplan_textfield"
-            android:text="Hello Vertretungsplan!"
+            android:text="Kein Plan vorhanden."
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>  -->
+            android:layout_height="wrap_content"/>
 
     <ExpandableListView android:id="@+id/expandable_list"
         android:layout_width="fill_parent"

@@ -32,13 +32,16 @@ import android.widget.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.atomic.AtomicMarkableReference;
 
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
 //import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 import de.createplus.vertretungsplan.listview.MyCustomAdapter;
+import de.createplus.vertretungsplan.listview.Parent;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 import static android.Manifest.permission.INTERNET;
@@ -201,14 +204,19 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if (currentContent == ContentViews.SUBSTITUTIONPLAN) {
+            findViewById(R.id.subplan_textfield).setVisibility(View.INVISIBLE);
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
             ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
             SPDatabaseHelper db = new SPDatabaseHelper(this);
             if (CurrentShown == 1) {
-                mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TodayDate)));
+                ArrayList<Parent> Plan = db.getPlan(TodayDate);
+                if(Plan.size() < 1) findViewById(R.id.subplan_textfield).setVisibility(View.VISIBLE);
+                mExpandableList.setAdapter(new MyCustomAdapter(this, Plan));
                 mExpandableList.setVisibility(View.VISIBLE);
             } else {
-                mExpandableList.setAdapter(new MyCustomAdapter(this, db.getPlan(TomorrowDate)));
+                ArrayList<Parent> Plan = db.getPlan(TomorrowDate);
+                if(Plan.size() < 1) findViewById(R.id.subplan_textfield).setVisibility(View.VISIBLE);
+                mExpandableList.setAdapter(new MyCustomAdapter(this, Plan));
                 mExpandableList.setVisibility(View.VISIBLE);
             }
 
