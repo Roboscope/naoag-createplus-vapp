@@ -187,9 +187,21 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
 
                     currentparent = new Parent();
                     currentparent.setTitle(CLASS);
-                    arrayChildren.add(COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT);
+                    String out = "";
+                    if(KIND.equals("Sondereins.")){
+                        out = TEXT + " " + " in der " + HOUR + " Stunde   Raum:" + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
+                    }else{
+                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
+                    }
+                    arrayChildren.add(out);
                 } else {
-                    arrayChildren.add(COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT);
+                    String out = "";
+                    if(KIND.equals("Sondereins.")){
+                        out = TEXT + " " + " in der " + HOUR + " Stunde   Raum:" + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
+                    }else{
+                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
+                    }
+                    arrayChildren.add(out);
                 }
             } while (cursor.moveToNext());
             currentparent.setArrayChildren(arrayChildren);

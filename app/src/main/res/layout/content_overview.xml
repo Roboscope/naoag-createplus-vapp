@@ -14,10 +14,11 @@
         tools:showIn="@layout/app_bar_main"
         tools:context="de.createplus.vertretungsplan.MainActivity">
 
-    <TextView
-            android:text="Hello Overview!"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+    <WebView
+        android:id="@+id/overview_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </WebView>
 
 
 </RelativeLayout>

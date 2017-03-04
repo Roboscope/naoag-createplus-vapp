@@ -11,7 +11,7 @@ public enum ContentViews {
     OVERVIEW(R.layout.content_overview),
     TIMETABLE(R.layout.content_timetable),
     SUBSTITUTIONPLAN(R.layout.content_substitutionplan),
-    SETTINGS(R.layout.content_settings);
+    ADVERTISMENT(R.layout.content_advertisment);
 
     private int id;
 

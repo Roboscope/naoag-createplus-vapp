@@ -28,6 +28,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.*;
 
 import java.text.DateFormat;
@@ -36,8 +37,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 
+import de.createplus.vertretungsplan.backgroundservices.Timetable;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
+import de.createplus.vertretungsplan.backgroundservices.UpdateTimetable;
+import de.createplus.vertretungsplan.backgroundservices.UpdateTimetableReceiver;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
 //import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 import de.createplus.vertretungsplan.listview.MyCustomAdapter;
@@ -57,20 +61,24 @@ public class MainActivity extends AppCompatActivity
     static public String TomorrowDate = "*ERROR*";
     static public String TomorrowDateString = "*ERROR*";
     static final private int INTERNET_REQUEST_CODE = 1;
+    static public String Plan = "Empty";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Calendar calander = Calendar.getInstance();
-
+        while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))){
+            calander.add(Calendar.DATE, -1);
+            Log.e("DATE", "added to:" + calander.get(Calendar.DAY_OF_WEEK));
+        }
         int cDay = calander.get(Calendar.DAY_OF_MONTH);
         int cMonth = calander.get(Calendar.MONTH) + 1;
         int cYear = calander.get(Calendar.YEAR);
         TodayDate = cDay + "." + cMonth + "." + cYear;
         Log.e("DATE", "" + calander.get(Calendar.DAY_OF_WEEK));
         calander.add(Calendar.DATE, 1);
-        while (!(calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY)){
+        while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))){
             calander.add(Calendar.DATE, 1);
             Log.e("DATE", "added to:" + calander.get(Calendar.DAY_OF_WEEK));
         }
@@ -82,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 
 
         // The filter's action is BROADCAST_ACTION
-        IntentFilter statusIntentFilter = new IntentFilter(
+        IntentFilter statusIntentFilterPlanData = new IntentFilter(
                 UpdatePlanData.Constants.BROADCAST_ACTION);
 
         // Instantiates a new DownloadStateReceiver
@@ -91,7 +99,19 @@ public class MainActivity extends AppCompatActivity
         // Registers the DownloadStateReceiver and its intent filters
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mUpdatePlanDataReceiver,
-                statusIntentFilter);
+                statusIntentFilterPlanData);
+
+        // The filter's action is BROADCAST_ACTION
+        IntentFilter statusIntentFilterTimetable = new IntentFilter(
+                UpdateTimetable.Constants.BROADCAST_ACTION);
+
+        // Instantiates a new DownloadStateReceiver
+        UpdateTimetableReceiver mUpdateTimetableReceiver =
+                new UpdateTimetableReceiver(this);
+        // Registers the DownloadStateReceiver and its intent filters
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mUpdateTimetableReceiver,
+                statusIntentFilterTimetable);
 
 
         setContentView(R.layout.activity_main);
@@ -170,12 +190,16 @@ public class MainActivity extends AppCompatActivity
             currentContent = ContentViews.SUBSTITUTIONPLAN;
             updateContainerContent();
         } else if (id == R.id.nav_timetable) {
+            Intent mServiceIntent = new Intent(MainActivity.this, UpdateTimetable.class);
+            MainActivity.this.startService(mServiceIntent);
             currentContent = ContentViews.TIMETABLE;
             updateContainerContent();
         } else if (id == R.id.nav_settings) {
+            currentContent = ContentViews.ADVERTISMENT;
+            updateContainerContent();
+        } else if (id == R.id.nav_share) {
             Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
             MainActivity.this.startActivity(myIntent);
-        } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
@@ -200,10 +224,10 @@ public class MainActivity extends AppCompatActivity
         content.addView(getLayoutInflater().inflate(currentContent.getId(), content, false), 0);
 
         if (currentContent == ContentViews.OVERVIEW) {
+            setTitle("Übersicht");
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
-
-
         } else if (currentContent == ContentViews.SUBSTITUTIONPLAN) {
+            setTitle("Vertretungsplan");
             findViewById(R.id.subplan_textfield).setVisibility(View.INVISIBLE);
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
             ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
@@ -244,9 +268,23 @@ public class MainActivity extends AppCompatActivity
 
 
         } else if (currentContent == ContentViews.TIMETABLE) {
+            setTitle("Stundenplan");
+            if(Plan != null){
+                //TextView Test = (TextView) findViewById(R.id.timetable_textfield);
+                //Test.setText(Plan);
+                WebView TABLE = (WebView) findViewById(R.id.timetable_table);
+                TABLE.loadData(Plan, "text/html", null);
+                TABLE.getSettings().setBuiltInZoomControls(true);
+                TABLE.getSettings().setDisplayZoomControls(false);
+                TABLE.setLongClickable(false);
 
-        } else if (currentContent == ContentViews.SETTINGS) {
+            }
 
+            //Timetable Plan = new Timetable(7,"c",20,"schueler","SuS74!");
+
+
+        } else if (currentContent == ContentViews.ADVERTISMENT) {
+            setTitle("Werbung");
         }
     }
 

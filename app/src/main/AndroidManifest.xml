@@ -31,6 +31,10 @@
         <service
                 android:name=".backgroundservices.UpdatePlanData"
                 android:exported="false"/>
+        <service
+            android:name=".backgroundservices.UpdateTimetable"
+            android:exported="false"/>
+
 
     </application>
 

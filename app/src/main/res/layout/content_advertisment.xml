@@ -13,7 +13,10 @@
         tools:showIn="@layout/app_bar_main"
         tools:context="de.createplus.vertretungsplan.MainActivity">
 
-
+    <TextView
+        android:text="WERBUNG!!"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 
 </RelativeLayout>
