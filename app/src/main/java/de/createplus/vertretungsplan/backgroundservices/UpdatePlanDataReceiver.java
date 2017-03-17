@@ -38,7 +38,7 @@ public class UpdatePlanDataReceiver extends BroadcastReceiver {
                 .setAction("Action", null).show();
         activity.updateContainerContent();
 
-        showNotification(context, "Vertrtungsplan Download", msg, R.drawable.ic_menu_send);
+        //showNotification(context, "Vertrtungsplan Download", msg, R.drawable.ic_menu_send);
 
 
         //activity.Plan = intent.getExtras().getString(UpdatePlanData.Constants.EXTENDED_DATA_STATUS);

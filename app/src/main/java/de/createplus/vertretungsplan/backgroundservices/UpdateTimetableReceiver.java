@@ -38,8 +38,6 @@ public class UpdateTimetableReceiver extends BroadcastReceiver {
 
         //showNotification(context, "Stundenplan Download", msg, R.drawable.ic_menu_send);
 
-
-        activity.Plan = msg;
         activity.updateContainerContent();
 
 

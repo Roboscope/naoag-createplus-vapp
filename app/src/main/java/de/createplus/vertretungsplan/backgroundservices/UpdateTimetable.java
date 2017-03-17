@@ -10,6 +10,7 @@ import android.util.Log;
 import java.io.IOException;
 
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
+import de.createplus.vertretungsplan.databases.ThtmlDatabaseHelper;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 /**
@@ -56,6 +57,9 @@ public class UpdateTimetable extends IntentService {
             out = "<html><h1>Stufen Einstellung nicht verwendbar.</h1> </html>";
         }
 
+        ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
+        db.removeAll();
+        db.addLine(weekPref,classPref,out);
         //Plan.print();
         //System.out.print(Plan.toString());
         Intent localIntent = new Intent(Constants.BROADCAST_ACTION).putExtra(Constants.EXTENDED_DATA_STATUS, out);

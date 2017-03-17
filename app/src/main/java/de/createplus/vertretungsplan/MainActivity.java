@@ -44,6 +44,7 @@ import de.createplus.vertretungsplan.backgroundservices.UpdateTimetable;
 import de.createplus.vertretungsplan.backgroundservices.UpdateTimetableReceiver;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
 //import de.createplus.vertretungsplan.listview.MyCustomAdapter;
+import de.createplus.vertretungsplan.databases.ThtmlDatabaseHelper;
 import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 import de.createplus.vertretungsplan.listview.Parent;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
@@ -226,6 +227,8 @@ public class MainActivity extends AppCompatActivity
         if (currentContent == ContentViews.OVERVIEW) {
             setTitle("Übersicht");
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
+            WebView web = (WebView) findViewById(R.id.overview_webview);
+            web.loadData("<html>    <link href=\"https://fonts.googleapis.com/css?family=Source+Sans+Pro\" rel=\"stylesheet\">    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">    <style>        .coupon {            width: 250px;            padding: 10px;            text-align: center;            border: 3px dashed #0099ff; }        .t {            font-family: 'Source Sans Pro', sans-serif; }        .z {            font-family: 'Open Sans', sans-serif; }    </style>    <table cellspacing=\"10\" class=\"t\"><tr class=\"z\"><th>Heute: Montag,<br>06.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr><tr class=\"z\"><th><br>Morgen: Dienstag,<br>07.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr></table> </html>\n", "text/html", null);
         } else if (currentContent == ContentViews.SUBSTITUTIONPLAN) {
             setTitle("Vertretungsplan");
             findViewById(R.id.subplan_textfield).setVisibility(View.INVISIBLE);
@@ -273,7 +276,9 @@ public class MainActivity extends AppCompatActivity
                 //TextView Test = (TextView) findViewById(R.id.timetable_textfield);
                 //Test.setText(Plan);
                 WebView TABLE = (WebView) findViewById(R.id.timetable_table);
-                TABLE.loadData(Plan, "text/html", null);
+                ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
+                String tmp = db.getHtml();
+                TABLE.loadData(tmp, "text/html", null);
                 TABLE.getSettings().setBuiltInZoomControls(true);
                 TABLE.getSettings().setDisplayZoomControls(false);
                 TABLE.setLongClickable(false);
