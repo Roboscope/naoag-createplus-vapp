@@ -3,15 +3,19 @@ package de.createplus.vertretungsplan.backgroundservices;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
 
+import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
 import de.createplus.vertretungsplan.databases.ThtmlDatabaseHelper;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
+
+import static de.createplus.vertretungsplan.backgroundservices.Timetable.getTimtableIndex;
 
 /**
  * TODO: MISSING JAVADOC
@@ -37,6 +41,7 @@ public class UpdateTimetable extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String classPref = sharedPref.getString(SettingsActivity.KEY_STUFE, "");
         String weekPref = sharedPref.getString(SettingsActivity.KEY_WEEK, "");
@@ -45,6 +50,9 @@ public class UpdateTimetable extends IntentService {
         String out = "";
         if(classPref.length() > 0 && Integer.parseInt(classPref) <23 && Integer.parseInt(classPref) >0){
             try{
+                Pair pref = getTimtableIndex("schueler","SuS74!");
+                MainActivity.TimetableIndex = pref;
+
                 Timetable Plan = new Timetable(Integer.parseInt(weekPref),"c",Integer.parseInt(classPref),"schueler","SuS74!");
                 Plan.update();
                 Plan.print();

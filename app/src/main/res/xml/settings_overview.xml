@@ -60,23 +60,16 @@
             android:persistent="false"
             android:title="Kurse">
 
-            <ListPreference
-                android:title="GK1"
-                android:summary="Select the kind of data that you would like to download"
-                android:key="downloadType"
-                android:defaultValue="1"
-                android:entries="@array/listArray"
-                android:entryValues="@array/listValues" />
+
 
         </PreferenceScreen>
 
-        <EditTextPreference
-            android:dependency="pref_key_class"
-            android:key="pref_key_class"
-            android:summary="Stufe"
-            android:defaultValue="21"
-            android:inputType="number"
-            android:title="" />
+        <ListPreference
+            android:title="Stufe"
+            android:key="pref_key_list_class"
+            android:defaultValue="0"
+            android:entries="@array/className"
+            android:entryValues="@array/classValue" />
 
         <EditTextPreference
             android:dependency="pref_key_timetable_week"

@@ -1,5 +1,8 @@
 package de.createplus.vertretungsplan.backgroundservices;
 
+import android.support.annotation.NonNull;
+import android.util.Log;
+
 import org.apache.commons.codec.binary.Base64;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -7,8 +10,13 @@ import org.jsoup.safety.Whitelist;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -16,7 +24,7 @@ import java.util.regex.Pattern;
  */
 
 public class Timetable {
-    String urlArchive = "http://gymnasium-wuerselen.de/untis/Schueler-Stundenplan/";
+    static String urlArchive = "http://gymnasium-wuerselen.de/untis/Schueler-Stundenplan/";
     String schoolname = "Gymnasium der Stadt Würselen";
     String url;
     String password;
@@ -153,6 +161,34 @@ public class Timetable {
             }
         }
     }
+
+    public static Pair getTimtableIndex(String username, String password) throws IOException{
+
+        String url = urlArchive + "frames/navbar.htm";
+        String base64login = new String(Base64.encodeBase64((username + ":" + password).getBytes())); // creating an encoded login
+        Document doc = Jsoup.connect(url).header("Authorization", "Basic " + base64login).get(); //loading page.
+
+        String htmlraw = doc.html(); // get raw html
+        Matcher m = Pattern.compile("var classes = \\[.+\\];").matcher(htmlraw);
+        String classes = "";
+        if (m.find()) {
+             classes = m.group().replace("var classes = [", "").replace("];","").replace("\"","");
+        }
+
+        String[] classesSplit = classes.split(",");
+
+        m = Pattern.compile("<select name=\"week\" class=\"selectbox\" [^&]+<\\/select>").matcher(htmlraw);
+        String weeks = "";
+        if (m.find()) {
+            weeks = m.group().replace("<select name=\"week\" class=\"selectbox\" onchange=\"doDisplayTimetable(NavBar, topDir);\"> ","").replace("<option value=","").replace("</select>","");
+        }
+        String[] weeksSplit = weeks.split("</option> ");
+        Log.e("Week",weeksSplit[0]+"|"+weeksSplit[1]);
+
+        return new Pair(classesSplit,weeksSplit);
+    }
+
+
 
     public void print(){
         for(int i = 0; i<plan.length; i++)

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 
+import de.createplus.vertretungsplan.backgroundservices.Pair;
 import de.createplus.vertretungsplan.backgroundservices.Timetable;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
@@ -55,7 +56,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     static private ContentViews currentContent = ContentViews.SUBSTITUTIONPLAN;
 
-
+    static public Pair TimetableIndex = null;
     static private int CurrentShown = 1;
     static public String TodayDate = "*ERROR*";
     static public String TodayDateString = "*ERROR*";
@@ -68,26 +69,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Calendar calander = Calendar.getInstance();
-        while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))){
-            calander.add(Calendar.DATE, -1);
-            Log.e("DATE", "added to:" + calander.get(Calendar.DAY_OF_WEEK));
-        }
-        int cDay = calander.get(Calendar.DAY_OF_MONTH);
-        int cMonth = calander.get(Calendar.MONTH) + 1;
-        int cYear = calander.get(Calendar.YEAR);
-        TodayDate = cDay + "." + cMonth + "." + cYear;
-        Log.e("DATE", "" + calander.get(Calendar.DAY_OF_WEEK));
-        calander.add(Calendar.DATE, 1);
-        while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))){
-            calander.add(Calendar.DATE, 1);
-            Log.e("DATE", "added to:" + calander.get(Calendar.DAY_OF_WEEK));
-        }
-
-        cDay = calander.get(Calendar.DAY_OF_MONTH);
-        cMonth = calander.get(Calendar.MONTH) + 1;
-        cYear = calander.get(Calendar.YEAR);
-        TomorrowDate = cDay + "." + cMonth + "." + cYear;
+        updateDate();
 
 
         // The filter's action is BROADCAST_ACTION
@@ -141,6 +123,32 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         updateContainerContent();
+    }
+
+    public void updateDate(){
+        String[] days = {"Montag","Dienstag","Mittwoch","Donnerstag","Freitag", "Samstag","Sonntag"};
+        Calendar calander = Calendar.getInstance();
+        while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))){
+            calander.add(Calendar.DATE, -1);
+            Log.e("DATE", "added to:" + calander.get(Calendar.DAY_OF_WEEK));
+        }
+        int cDay = calander.get(Calendar.DAY_OF_MONTH);
+        int cMonth = calander.get(Calendar.MONTH) + 1;
+        int cYear = calander.get(Calendar.YEAR);
+        TodayDate = cDay + "." + cMonth + "." + cYear;
+        TodayDateString = "Heute: " + days[calander.get(Calendar.DAY_OF_WEEK)-1] + " " + TodayDate;
+        Log.e("DATE", "" + calander.get(Calendar.DAY_OF_WEEK));
+        calander.add(Calendar.DATE, 1);
+        while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))){
+            calander.add(Calendar.DATE, 1);
+            Log.e("DATE", "added to:" + calander.get(Calendar.DAY_OF_WEEK));
+        }
+
+        cDay = calander.get(Calendar.DAY_OF_MONTH);
+        cMonth = calander.get(Calendar.MONTH) + 1;
+        cYear = calander.get(Calendar.YEAR);
+        TomorrowDate = cDay + "." + cMonth + "." + cYear;
+        TomorrowDateString = "Morgen: " + days[calander.get(Calendar.DAY_OF_WEEK)-1] + " " + TomorrowDate;
     }
 
 
@@ -250,18 +258,18 @@ public class MainActivity extends AppCompatActivity
             //Setup SPPlan Toggle Button
             final Button SW = (Button) findViewById(R.id.sw);
 
-            if (CurrentShown == 1) SW.setText(TodayDate);
-            else SW.setText(TomorrowDate);
+            if (CurrentShown == 1) SW.setText(TodayDateString);
+            else SW.setText(TomorrowDateString);
 
             SW.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     if (CurrentShown == 1) {
                         CurrentShown = 2;
-                        SW.setText(TomorrowDate);
+                        SW.setText(TomorrowDateString);
                         updateContainerContent();
                     } else {
 
-                        SW.setText(TodayDate);
+                        SW.setText(TodayDateString);
                         CurrentShown = 1;
                         updateContainerContent();
                     }
