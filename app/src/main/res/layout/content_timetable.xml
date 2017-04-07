@@ -103,13 +103,6 @@
         android:layout_height="wrap_content">
     </WebView>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="A-Woche"
-        android:id="@+id/sw_timetabel_week"
-        android:visibility="visible"
-        android:layout_alignParentBottom="true" />
 
 
 </RelativeLayout>

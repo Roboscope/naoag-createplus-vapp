@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.IdentityHashMap;
 
+import de.createplus.vertretungsplan.backgroundservices.Pair;
 import de.createplus.vertretungsplan.listview.Parent;
 
 
@@ -69,6 +71,11 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
         this.getWritableDatabase().execSQL(SQL_DELETE_ENTRIES);
     }
 
+    public void removeAnnotations() {
+
+    }
+
+
     public String getHtml() {
         String[] projection = {
                 ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK,
@@ -76,7 +83,7 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
                 ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML
         };
 
-        String selection = ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK + " > ?";
+        String selection = ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK + " >= ?";
         String[] selectionArgs = {"0"};
 
         String sortOrder =
@@ -101,7 +108,50 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
         }
         return result;
     }
+    public Pair getClassWeek() {
+        String[] projection = {
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK,
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS,
+        };
 
+        String selection = ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK + " > ?";
+        String[] selectionArgs = {"0"};
+
+        String sortOrder =
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                ThtmlContract.ThtmlEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        String[] a = new String[2];
+        String[] b = new String[2];
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            int i=0;
+            do {
+                String x = cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK));
+                String y = cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS));
+
+                if(i==0 && Integer.parseInt(y) > 0){
+                    a[0] = x;
+                    a[1] = y;
+                }else if(i==1 && Integer.parseInt(y) > 0){
+                    b[0] = x;
+                    b[1] = y;
+                }
+                i++;
+
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return new Pair(a,b) ;
+    }
 
     public ArrayList<Parent> getPlan(String date) {
         String[] projection = {
@@ -197,5 +247,40 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
         }
         return arrayParents;
     }
+
+    public String[] getHtmlArray() {
+        String[] projection = {
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK,
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS,
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML
+        };
+
+        String selection = ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK + " > ?";
+        String[] selectionArgs = {"0"};
+
+        String sortOrder =
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                ThtmlContract.ThtmlEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        String result = "";
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                result += cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML)) + "$$SPLITPOINT$$";
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return result.split("$$SPLITPOINT$$");
+    }
+
+
 
 }

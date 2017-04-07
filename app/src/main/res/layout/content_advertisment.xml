@@ -14,7 +14,7 @@
         tools:context="de.createplus.vertretungsplan.MainActivity">
 
     <TextView
-        android:text="WERBUNG!!"
+        android:text="Hier könnte ihre Werbung stehen!!!"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

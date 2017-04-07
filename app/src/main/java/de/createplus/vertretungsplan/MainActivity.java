@@ -62,14 +62,17 @@ public class MainActivity extends AppCompatActivity
     static public String TodayDateString = "*ERROR*";
     static public String TomorrowDate = "*ERROR*";
     static public String TomorrowDateString = "*ERROR*";
-    static final private int INTERNET_REQUEST_CODE = 1;
-    static public String Plan = "Empty";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         updateDate();
+
+        //Update Subplan if needed.
+        Context con = getApplicationContext();
+        Intent mServiceIntent = new Intent(con, UpdateTimetable.class);
+        con.startService(mServiceIntent);
 
 
         // The filter's action is BROADCAST_ACTION
@@ -136,7 +139,7 @@ public class MainActivity extends AppCompatActivity
         int cMonth = calander.get(Calendar.MONTH) + 1;
         int cYear = calander.get(Calendar.YEAR);
         TodayDate = cDay + "." + cMonth + "." + cYear;
-        TodayDateString = "Heute: " + days[calander.get(Calendar.DAY_OF_WEEK)-1] + " " + TodayDate;
+        TodayDateString = "Heute: " + days[calander.get(Calendar.DAY_OF_WEEK)-2] + " " + TodayDate;
         Log.e("DATE", "" + calander.get(Calendar.DAY_OF_WEEK));
         calander.add(Calendar.DATE, 1);
         while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))){
@@ -148,7 +151,7 @@ public class MainActivity extends AppCompatActivity
         cMonth = calander.get(Calendar.MONTH) + 1;
         cYear = calander.get(Calendar.YEAR);
         TomorrowDate = cDay + "." + cMonth + "." + cYear;
-        TomorrowDateString = "Morgen: " + days[calander.get(Calendar.DAY_OF_WEEK)-1] + " " + TomorrowDate;
+        TomorrowDateString = "Morgen: " + days[calander.get(Calendar.DAY_OF_WEEK)-2 ] + " " + TomorrowDate;
     }
 
 
@@ -199,8 +202,6 @@ public class MainActivity extends AppCompatActivity
             currentContent = ContentViews.SUBSTITUTIONPLAN;
             updateContainerContent();
         } else if (id == R.id.nav_timetable) {
-            Intent mServiceIntent = new Intent(MainActivity.this, UpdateTimetable.class);
-            MainActivity.this.startService(mServiceIntent);
             currentContent = ContentViews.TIMETABLE;
             updateContainerContent();
         } else if (id == R.id.nav_settings) {
@@ -235,10 +236,12 @@ public class MainActivity extends AppCompatActivity
         if (currentContent == ContentViews.OVERVIEW) {
             setTitle("Übersicht");
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
-            WebView web = (WebView) findViewById(R.id.overview_webview);
-            web.loadData("<html>    <link href=\"https://fonts.googleapis.com/css?family=Source+Sans+Pro\" rel=\"stylesheet\">    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">    <style>        .coupon {            width: 250px;            padding: 10px;            text-align: center;            border: 3px dashed #0099ff; }        .t {            font-family: 'Source Sans Pro', sans-serif; }        .z {            font-family: 'Open Sans', sans-serif; }    </style>    <table cellspacing=\"10\" class=\"t\"><tr class=\"z\"><th>Heute: Montag,<br>06.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr><tr class=\"z\"><th><br>Morgen: Dienstag,<br>07.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr></table> </html>\n", "text/html", null);
+            //WebView web = (WebView) findViewById(R.id.overview_webview);
+            //web.loadData("<html>    <link href=\"https://fonts.googleapis.com/css?family=Source+Sans+Pro\" rel=\"stylesheet\">    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">    <style>        .coupon {            width: 250px;            padding: 10px;            text-align: center;            border: 3px dashed #0099ff; }        .t {            font-family: 'Source Sans Pro', sans-serif; }        .z {            font-family: 'Open Sans', sans-serif; }    </style>    <table cellspacing=\"10\" class=\"t\"><tr class=\"z\"><th>Heute: Montag,<br>06.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr><tr class=\"z\"><th><br>Morgen: Dienstag,<br>07.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr></table> </html>\n", "text/html", null);
+
         } else if (currentContent == ContentViews.SUBSTITUTIONPLAN) {
             setTitle("Vertretungsplan");
+            updateDate();
             findViewById(R.id.subplan_textfield).setVisibility(View.INVISIBLE);
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
             ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
@@ -280,21 +283,15 @@ public class MainActivity extends AppCompatActivity
 
         } else if (currentContent == ContentViews.TIMETABLE) {
             setTitle("Stundenplan");
-            if(Plan != null){
-                //TextView Test = (TextView) findViewById(R.id.timetable_textfield);
-                //Test.setText(Plan);
-                WebView TABLE = (WebView) findViewById(R.id.timetable_table);
-                ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
-                String tmp = db.getHtml();
-                TABLE.loadData(tmp, "text/html", null);
-                TABLE.getSettings().setBuiltInZoomControls(true);
-                TABLE.getSettings().setDisplayZoomControls(false);
-                TABLE.setLongClickable(false);
 
-            }
-
-            //Timetable Plan = new Timetable(7,"c",20,"schueler","SuS74!");
-
+            WebView TABLE = (WebView) findViewById(R.id.timetable_table);
+            ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
+            String tmp = db.getHtml();
+            TABLE.loadData(tmp, "text/html","UTF-8");
+            TABLE.loadDataWithBaseURL("fake://fake.de",tmp, "text/html","UTF-8",null);
+            TABLE.getSettings().setBuiltInZoomControls(true);
+            TABLE.getSettings().setDisplayZoomControls(false);
+            TABLE.setLongClickable(false);
 
         } else if (currentContent == ContentViews.ADVERTISMENT) {
             setTitle("Werbung");
@@ -316,5 +313,10 @@ public class MainActivity extends AppCompatActivity
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(0, builder.build());
+    }
+
+    private void setupOverview(){
+        TableLayout LayoutToday = (TableLayout) findViewById(R.id.overview_tablelayout_inner_A);
+        Timetable CurrentWeek;
     }
 }

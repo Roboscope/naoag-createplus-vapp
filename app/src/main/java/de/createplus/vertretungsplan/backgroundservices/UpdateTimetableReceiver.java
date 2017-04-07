@@ -32,9 +32,9 @@ public class UpdateTimetableReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String msg = intent.getExtras().getString(UpdateTimetable.Constants.EXTENDED_DATA_STATUS);
 
-        /*Snackbar.make(activity.findViewById(R.id.main_content), msg, Snackbar.LENGTH_LONG)
+        Snackbar.make(activity.findViewById(R.id.main_content), msg, Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
-        activity.updateContainerContent();*/
+        activity.updateContainerContent();
 
         //showNotification(context, "Stundenplan Download", msg, R.drawable.ic_menu_send);
 

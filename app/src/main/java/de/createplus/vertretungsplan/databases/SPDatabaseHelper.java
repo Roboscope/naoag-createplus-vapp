@@ -132,12 +132,10 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
                 SPContract.SPEntry.COLUMN_NAME_PLANINFO,
         };
 
-        //String selection = SPContract.SPEntry._ID + " > ?";
-        //String[] selectionArgs = {"0"};
+
         String selection = SPContract.SPEntry.COLUMN_NAME_DATE + " = ?";
         String[] selectionArgs = {date};
 
-        //Log.e("SQL", date);
 
         String sortOrder =
                 SPContract.SPEntry.COLUMN_NAME_CLASS + " ASC";
@@ -191,17 +189,17 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
                     currentparent.setTitle(CLASS);
                     String out = "";
                     if(KIND.equals("Sondereins.")){
-                        out = TEXT + " " + " in der " + HOUR + " Stunde   Raum:" + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
+                        out = TEXT + " " + " in der " + HOUR + " Stunde   \nRaum: " + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
                     }else{
-                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
+                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
                     }
                     arrayChildren.add(out);
                 } else {
                     String out = "";
                     if(KIND.equals("Sondereins.")){
-                        out = TEXT + " " + " in der " + HOUR + " Stunde   Raum:" + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
+                        out = TEXT + " " + " in der " + HOUR + " Stunde   \nRaum: " + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
                     }else{
-                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
+                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
                     }
                     arrayChildren.add(out);
                 }

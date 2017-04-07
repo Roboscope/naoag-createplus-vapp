@@ -71,14 +71,6 @@
             android:entries="@array/className"
             android:entryValues="@array/classValue" />
 
-        <EditTextPreference
-            android:dependency="pref_key_timetable_week"
-            android:key="pref_key_timetable_week"
-            android:summary="Kalenderwoche"
-            android:defaultValue="7"
-            android:inputType="number"
-            android:title="Woche" />
-
     </PreferenceCategory>
 
 </PreferenceScreen>
