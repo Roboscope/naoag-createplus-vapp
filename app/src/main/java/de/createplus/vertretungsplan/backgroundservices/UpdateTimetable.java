@@ -79,44 +79,52 @@ public class UpdateTimetable extends IntentService {
         String[] Indexes = MainActivity.TimetableIndex.b;
         String[] weekCurrent = Indexes[0].split(">");
         String[] weekNext = Indexes[1].split(">");
-        Log.e("Timetable", weekCurrent[0]);
-        Log.e("Timetable", weekNext[0]);
+        //Log.e("Timetable", weekCurrent[0]);
+        //Log.e("Timetable", weekNext[0]);
         weeks[0] = Integer.parseInt(weekCurrent[0].replace("\"",""));
         weeks[1] = Integer.parseInt(weekNext[0].replace("\"",""));
 
 
         Pair inSQL = db.getClassWeek();
         int testifequal = 0;
-        Log.e("inSQL", inSQL + "");
-        if(inSQL.a[0].equals(weekCurrent[0].replace("\"",""))){
-            Log.e("EQUALIZER","A IS EQUAL");
-            testifequal++;
-        }
-        if(inSQL.b[0].equals(weekNext[0].replace("\"",""))){
-            Log.e("EQUALIZER","B IS EQUAL");
-            testifequal++;
-        }
-        if(inSQL.a[1].equals(classPref)){
-            Log.e("EQUALIZER","A2 IS EQUAL");
-            testifequal++;
-        }
-        if(inSQL.b[1].equals(classPref)){
-            Log.e("EQUALIZER","B2 IS EQUAL");
-            testifequal++;
+        //Log.e("inSQL", inSQL + "");
+        if(inSQL.a[0] != null){
+            if(inSQL.a[0].equals(weekCurrent[0].replace("\"",""))){
+                Log.e("Update Timetable","WEEK ONE IS EQUAL");
+                testifequal++;
+            }
+            if(inSQL.b[0].equals(weekNext[0].replace("\"",""))){
+                Log.e("Update Timetable","WEEK TWO IS EQUAL");
+                testifequal++;
+            }
+            if(inSQL.a[1].equals(classPref)){
+                Log.e("Update Timetable","CLASS IS EQUAL");
+                testifequal++;
+            }
+            if(inSQL.b[1].equals(classPref)){
+                Log.e("Update Timetable","CLASS IS EQUAL");
+                testifequal++;
+            }
         }
 
         if(testifequal == 4){
+            Log.e("Update Timetable","Not updating.");
             return;
-        }
+        }Log.e("Update Timetable","Updating.");
 
-        String msg = "Vertretungsplan erfolgreich neu geladen!";
+        String msg = "Stundenplanplan erfolgreich neu geladen!";
         if(classPref.length() > 0 && Integer.parseInt(classPref) > 0){
             try{
                 Timetable Plan = new Timetable(weeks[0],"c",Integer.parseInt(classPref),studentUSERNAMEPref,studentPASSWORDPref);
                 Plan.update();
-                //Plan.print();
+                Plan.print();
+                Plan.addToSQL(this);
                 db.removeAll();
-                db.addLine(weeks[0]+"",classPref,Plan.getHtml());
+                String weekname = "A";
+                if(weeks[0]%2 > 0){
+                    weekname = "B";
+                }
+                db.addLine(weeks[0]+"",classPref,Plan.getHtml().replace("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">", "<font size=\"7\" face=\"Arial\" color=\"#0000FF\">" + weekname +":"));
 
             }catch (IOException e){
                 msg = "Download Error (Plan für: "+ weekCurrent[1] +")";
@@ -129,8 +137,13 @@ public class UpdateTimetable extends IntentService {
             try{
                 Timetable Plan = new Timetable(weeks[1],"c",Integer.parseInt(classPref),studentUSERNAMEPref,studentPASSWORDPref);
                 Plan.update();
-                //Plan.print();
-                db.addLine(weeks[1]+"",classPref,Plan.getHtml());
+                Plan.print();
+                Plan.addToSQL(this);
+                String weekname = "A";
+                if(weeks[1]%2 > 0){
+                    weekname = "B";
+                }
+                db.addLine(weeks[1]+"",classPref,Plan.getHtml().replace("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">", "<font size=\"7\" face=\"Arial\" color=\"#0000FF\">" + weekname +":"));
 
             }catch (IOException e){
                 msg = "Download Error (Vertretungsplan für: "+ weekNext[1] +")";
@@ -138,7 +151,6 @@ public class UpdateTimetable extends IntentService {
         }else{
             msg = "Bitte Stufe in den Einstellungen auswählen.";
         }
-
 
         Intent localIntent = new Intent(Constants.BROADCAST_ACTION).putExtra(Constants.EXTENDED_DATA_STATUS, msg);
 

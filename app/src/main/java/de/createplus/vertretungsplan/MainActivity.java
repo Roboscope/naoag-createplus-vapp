@@ -202,6 +202,9 @@ public class MainActivity extends AppCompatActivity
             currentContent = ContentViews.SUBSTITUTIONPLAN;
             updateContainerContent();
         } else if (id == R.id.nav_timetable) {
+            Context con = getApplicationContext();
+            Intent mServiceIntent = new Intent(con, UpdateTimetable.class);
+            con.startService(mServiceIntent);
             currentContent = ContentViews.TIMETABLE;
             updateContainerContent();
         } else if (id == R.id.nav_settings) {

@@ -1,5 +1,6 @@
 package de.createplus.vertretungsplan.backgroundservices;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -18,6 +19,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import de.createplus.vertretungsplan.databases.TgroupsDatabaseHelper;
+import de.createplus.vertretungsplan.databases.TplanDatabaseHelper;
 
 /**
  * Created by Max Nuglisch on 01.02.2017.
@@ -236,5 +240,30 @@ public class Timetable {
         String tmp = ""+i;
         while(tmp.length() < fix) tmp = "0"+tmp;
         return tmp;
+    }
+
+    public void addToSQL(Context context){
+        TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(context);
+        TplanDatabaseHelper dbplan = new TplanDatabaseHelper(context);
+        for(int day = 1; day <6; day++){
+            for(int hour = 1; hour < 12; hour++){
+                String tmp = plan[hour][day];
+                if(tmp != null && tmp != "FREE" && tmp != "PAUSE"){
+                    String[] parts = tmp.split("%");
+                    Log.e("TimetableToSQL",tmp);
+                    dbplan.addLine(000000, day, hour, parts[0]);
+                    if(!dbgroups.doesExist(parts[0])){
+                        Matcher m = Pattern.compile(" [^ ]+ [^ ]+ [^ ]+").matcher(parts[1]);
+                        Log.e("TimetableToSQL","created group: " + parts[0]);
+                        while(m.find()){
+                            String tmpin = m.group();
+                            dbgroups.addLine(parts[0],tmpin,false);
+                            Log.e("TimetableToSQL","added: " + tmpin);
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }

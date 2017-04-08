@@ -15,7 +15,7 @@ import java.util.LinkedList;
 
 public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "timetablegroups.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 6;
 
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + TgroupsContract.TgroupsEntry.TABLE_NAME + " (" +
@@ -103,6 +103,39 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
                 tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP));
                 tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
                 tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return ret;
+    }
+
+    public boolean doesExist(String group) {
+        String[] projection = {
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP,
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE,
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
+        };
+
+        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP+ " >= ?";
+        String[] selectionArgs = {group};
+
+        String sortOrder =
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                TgroupsContract.TgroupsEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        boolean ret = false;
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                ret = true;
             } while (cursor.moveToNext());
             cursor.close();
         }

@@ -17,7 +17,7 @@ import de.createplus.vertretungsplan.listview.Parent;
 
 public class TplanDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "timetablecourses.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + TplanContract.TplanEntry.TABLE_NAME + " (" +
