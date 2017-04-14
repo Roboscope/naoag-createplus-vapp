@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.databases.TgroupsDatabaseHelper;
 import de.createplus.vertretungsplan.databases.TplanDatabaseHelper;
 
@@ -87,7 +88,7 @@ public class Timetable {
                     String tmp2 =  Jsoup.clean(column.html(),wl);
                     if(Pattern.matches( "<b>[^ ]+</b>.+",  tmp2)){
                         tmp2 = tmp2.replace("<b>","");
-                        tmp = tmp.substring(0,tmp2.indexOf("</b>"))+"%"+tmp.substring(tmp2.indexOf("</b>"),tmp.length()-1);
+                        tmp = tmp.substring(0,tmp2.indexOf("</b>"))+"%"+tmp.substring(tmp2.indexOf("</b>"),tmp.length());
                     }
 
                     planList.add(tmp);
@@ -187,12 +188,10 @@ public class Timetable {
             weeks = m.group().replace("<select name=\"week\" class=\"selectbox\" onchange=\"doDisplayTimetable(NavBar, topDir);\"> ","").replace("<option value=","").replace("</select>","");
         }
         String[] weeksSplit = weeks.split("</option> ");
-        Log.e("Week",weeksSplit[0]+"|"+weeksSplit[1]);
+        //Log.e("Week",weeksSplit[0]+"|"+weeksSplit[1]);
 
         return new Pair(classesSplit,weeksSplit);
     }
-
-
 
     public void print(){
         for(int i = 0; i<plan.length; i++)
@@ -245,25 +244,28 @@ public class Timetable {
     public void addToSQL(Context context){
         TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(context);
         TplanDatabaseHelper dbplan = new TplanDatabaseHelper(context);
+
+
+
+
         for(int day = 1; day <6; day++){
             for(int hour = 1; hour < 12; hour++){
                 String tmp = plan[hour][day];
                 if(tmp != null && tmp != "FREE" && tmp != "PAUSE"){
                     String[] parts = tmp.split("%");
-                    Log.e("TimetableToSQL",tmp);
-                    dbplan.addLine(000000, day, hour, parts[0]);
+                    //Log.e("TimetableToSQL",tmp);
+                    dbplan.addLine(Integer.parseInt(date.split("[\\(\\)]")[3]), day, hour, parts[0]);
                     if(!dbgroups.doesExist(parts[0])){
                         Matcher m = Pattern.compile(" [^ ]+ [^ ]+ [^ ]+").matcher(parts[1]);
-                        Log.e("TimetableToSQL","created group: " + parts[0]);
+                        //Log.e("TimetableToSQL","created group: " + parts[0]);
                         while(m.find()){
                             String tmpin = m.group();
                             dbgroups.addLine(parts[0],tmpin,false);
-                            Log.e("TimetableToSQL","added: " + tmpin);
+                            //Log.e("TimetableToSQL","added: " + tmpin);
                         }
                     }
                 }
             }
         }
-
     }
 }

@@ -14,13 +14,7 @@ import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.R;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
 
-/**
- * TODO: MISSING JAVADOC
- *
- * @author Roboscope
- * @version 1.0
- * @since 2017-02-03
- */
+
 public class UpdatePlanDataReceiver extends BroadcastReceiver {
     // Prevents instantiation
     private MainActivity activity;

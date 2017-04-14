@@ -10,13 +10,7 @@ import de.createplus.vertretungsplan.substitutionplan.Substitutionplan;
 
 import java.io.IOException;
 
-/**
- * TODO: MISSING JAVADOC
- *
- * @author Roboscope
- * @version 1.0
- * @since 2017-02-03
- */
+
 public class UpdatePlanData extends IntentService {
     public final class Constants {
         // Defines a custom Intent action

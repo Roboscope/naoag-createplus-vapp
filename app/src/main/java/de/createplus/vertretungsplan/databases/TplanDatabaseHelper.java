@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import de.createplus.vertretungsplan.listview.Parent;
 
@@ -17,7 +18,7 @@ import de.createplus.vertretungsplan.listview.Parent;
 
 public class TplanDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "timetablecourses.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 10;
 
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + TplanContract.TplanEntry.TABLE_NAME + " (" +
@@ -70,7 +71,8 @@ public class TplanDatabaseHelper extends SQLiteOpenHelper {
         this.getWritableDatabase().execSQL(SQL_DELETE_ENTRIES);
     }
 
-    public String getPlan(int week) {
+    public LinkedList<String[]> getPlan(int week) {
+        LinkedList<String[]> ret = new LinkedList<String[]>();
         String[] projection = {
                 TplanContract.TplanEntry.COLUMN_NAME_WEEK,
                         TplanContract.TplanEntry.COLUMN_NAME_DAY,
@@ -93,15 +95,61 @@ public class TplanDatabaseHelper extends SQLiteOpenHelper {
                 null,
                 sortOrder
         );
-        String result = "";
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                result += cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_COURSEGROUP)) + "\n";
+                String[] tmp = new String[4];
+                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_WEEK));
+                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_DAY));
+                tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_HOUR));
+                tmp[4] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_COURSEGROUP));
+                //Log.e("GROUPS", Arrays.toString(tmp));
+                ret.add(tmp);
             } while (cursor.moveToNext());
             cursor.close();
         }
-        return result;
+        return ret;
+    }
+
+    public LinkedList<String[]> getPlan() {
+        LinkedList<String[]> ret = new LinkedList<String[]>();
+        String[] projection = {
+                TplanContract.TplanEntry.COLUMN_NAME_WEEK,
+                TplanContract.TplanEntry.COLUMN_NAME_DAY,
+                TplanContract.TplanEntry.COLUMN_NAME_HOUR,
+                TplanContract.TplanEntry.COLUMN_NAME_COURSEGROUP
+        };
+
+        String selection = TplanContract.TplanEntry._ID + " > ?";
+        String[] selectionArgs = {"0"};
+
+        String sortOrder =
+                TplanContract.TplanEntry.COLUMN_NAME_DAY + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                TplanContract.TplanEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                String[] tmp = new String[4];
+                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_WEEK));
+                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_DAY));
+                tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_HOUR));
+                tmp[3] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_COURSEGROUP));
+                //Log.e("GROUPS", Arrays.toString(tmp));
+                ret.add(tmp);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return ret;
     }
 
 }

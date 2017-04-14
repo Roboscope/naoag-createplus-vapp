@@ -5,12 +5,6 @@
         android:key="pref_key_login_settings"
         android:title="Login">
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_save_Logins"
-            android:summary="Anmeldedaten speichern?"
-            android:title="Speichern" />
-
         <PreferenceScreen
             android:key="pref_key_screen_logins"
             android:persistent="false"
@@ -22,12 +16,12 @@
                 <EditTextPreference
                     android:key="pref_key_studentlogin_username"
                     android:summary="Benutzername"
-                    android:title=""/>
+                    android:title="" />
                 <EditTextPreference
+                    android:inputType="textPassword"
                     android:key="pref_key_studentlogin_password"
                     android:summary="Passwort"
-                    android:inputType="textPassword"
-                    android:title=""/>
+                    android:title="" />
             </PreferenceCategory>
             <PreferenceCategory
                 android:key="pref_key_category_teacherlogin"
@@ -44,9 +38,9 @@
                     android:title="" />
                 <EditTextPreference
                     android:dependency="pref_key_teacherlogin_status"
+                    android:inputType="textPassword"
                     android:key="pref_key_teacherlogin_password"
                     android:summary="Passwort"
-                    android:inputType="textPassword"
                     android:title="" />
             </PreferenceCategory>
         </PreferenceScreen>
@@ -55,22 +49,33 @@
     <PreferenceCategory
         android:key="pref_key_category_timetable"
         android:title="Stundenplan">
-        <PreferenceScreen
-            android:key="pref_key_screen_timetableselection"
-            android:persistent="false"
+
+        <MultiSelectListPreference
+            android:entries="@array/className"
+            android:entryValues="@array/classValue"
+            android:key="pref_key_list_timetableselection"
             android:title="Kurse">
 
+        </MultiSelectListPreference>
 
-
-        </PreferenceScreen>
 
         <ListPreference
-            android:title="Stufe"
-            android:key="pref_key_list_class"
             android:defaultValue="0"
             android:entries="@array/className"
-            android:entryValues="@array/classValue" />
+            android:entryValues="@array/classValue"
+            android:key="pref_key_list_class"
+            android:title="Stufe" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="pref_key_ad_settings_screem"
+        android:title="Werbung">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_key_ad_status"
+            android:summary="Eine Möglichkeit mich zusätzlich zu unterstützen."
+            android:title="Werbung überall anzeigen" />
     </PreferenceCategory>
 
 </PreferenceScreen>

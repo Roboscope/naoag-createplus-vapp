@@ -12,13 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.R;
 
-/**
- * TODO: MISSING JAVADOC
- *
- * @author Roboscope
- * @version 1.0
- * @since 2017-02-03
- */
+
 public class UpdateTimetableReceiver extends BroadcastReceiver {
     // Prevents instantiation
     private MainActivity activity;

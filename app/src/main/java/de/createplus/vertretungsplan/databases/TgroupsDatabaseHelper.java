@@ -5,7 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 
@@ -15,7 +17,7 @@ import java.util.LinkedList;
 
 public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "timetablegroups.db";
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 10;
 
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + TgroupsContract.TgroupsEntry.TABLE_NAME + " (" +
@@ -70,8 +72,44 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
         this.getWritableDatabase().execSQL(SQL_DELETE_ENTRIES);
     }
 
+    public String[] getCourse(String course){
+        String[] projection = {
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP,
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE,
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
+        };
+        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?";
+        String[] selectionArgs = {course};
 
-    public LinkedList<String[]> getAllGroups() {
+        String sortOrder =
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                TgroupsContract.TgroupsEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        String[] tmp = new String[3];
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+
+                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP));
+                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
+                tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
+                Log.e("GROUPS", Arrays.toString(tmp));
+
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return tmp;
+    }
+
+    public LinkedList<String[]> getAllGroups()  {
         LinkedList<String[]> ret = new LinkedList<String[]>();
 
         String[] projection = {
@@ -103,10 +141,55 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
                 tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP));
                 tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
                 tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
+                Log.e("GROUPS", Arrays.toString(tmp));
+                ret.add(tmp);
             } while (cursor.moveToNext());
             cursor.close();
         }
         return ret;
+    }
+
+    public String getEnabledCourseOfGroup(String group) {
+        //Log.e("GROUPS", group);
+        String[] projection = {
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP,
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE,
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
+        };
+
+        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " = ?";
+        String[] selectionArgs = {group};
+
+        String sortOrder =
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                TgroupsContract.TgroupsEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                String[] tmp = new String[3];
+                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP));
+                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
+                tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
+                //Log.e("GROUPS", Arrays.toString(tmp) + " ----------" +Integer.parseInt(tmp[2]));
+                if(Integer.parseInt(tmp[2]) == 1){
+                    Log.e(group, Arrays.toString(tmp));
+                    return tmp[1];
+                }
+
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return null;
     }
 
     public boolean doesExist(String group) {
@@ -116,7 +199,7 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
                 TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
         };
 
-        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP+ " >= ?";
+        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP+ " = ?";
         String[] selectionArgs = {group};
 
         String sortOrder =

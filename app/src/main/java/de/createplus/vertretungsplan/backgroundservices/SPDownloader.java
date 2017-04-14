@@ -16,13 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * TODO: MISSING JAVADOC
- *
- * @author Roboscope
- * @version 1.0
- * @since 2017-02-10
- */
+
 public class SPDownloader {
     private static final String URL_ARCHIVE = "http://gymnasium-wuerselen.de/untis/";
 

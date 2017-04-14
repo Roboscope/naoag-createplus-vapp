@@ -20,7 +20,7 @@ import de.createplus.vertretungsplan.listview.Parent;
 
 public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "timetablehtml.db";
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + ThtmlContract.ThtmlEntry.TABLE_NAME + " (" +

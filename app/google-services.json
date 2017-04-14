@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1031451930533",
+    "firebase_url": "https://naoag-createplus-vapp.firebaseio.com",
+    "project_id": "naoag-createplus-vapp",
+    "storage_bucket": "naoag-createplus-vapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031451930533:android:b0d6fe9a4eb05df8",
+        "android_client_info": {
+          "package_name": "de.createplus.vertretungsplan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1031451930533-0d8fbpasl9dnllip55a2922rok21fhq1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.createplus.vertretungsplan",
+            "certificate_hash": "1f0182d031bf65d9f30370ab0ecd81a1cf974475"
+          }
+        },
+        {
+          "client_id": "1031451930533-chffqngjaad05asjnvc9s8rhggee65i0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1AGpqS4y-59BLXaJUGdwnywpLFNcjUus"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1031451930533-chffqngjaad05asjnvc9s8rhggee65i0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

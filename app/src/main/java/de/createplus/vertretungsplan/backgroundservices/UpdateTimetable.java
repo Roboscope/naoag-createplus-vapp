@@ -13,19 +13,15 @@ import java.io.IOException;
 
 import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.databases.SPDatabaseHelper;
+import de.createplus.vertretungsplan.databases.TgroupsDatabaseHelper;
 import de.createplus.vertretungsplan.databases.ThtmlContract;
 import de.createplus.vertretungsplan.databases.ThtmlDatabaseHelper;
+import de.createplus.vertretungsplan.databases.TplanDatabaseHelper;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 import static de.createplus.vertretungsplan.backgroundservices.Timetable.getTimtableIndex;
 
-/**
- * TODO: MISSING JAVADOC
- *
- * @author Roboscope
- * @version 1.0
- * @since 2017-02-03
- */
+
 public class UpdateTimetable extends IntentService {
     public final class Constants {
         // Defines a custom Intent action
@@ -90,27 +86,37 @@ public class UpdateTimetable extends IntentService {
         //Log.e("inSQL", inSQL + "");
         if(inSQL.a[0] != null){
             if(inSQL.a[0].equals(weekCurrent[0].replace("\"",""))){
-                Log.e("Update Timetable","WEEK ONE IS EQUAL");
+                //Log.e("Update Timetable","WEEK ONE IS EQUAL_TEST");
                 testifequal++;
             }
             if(inSQL.b[0].equals(weekNext[0].replace("\"",""))){
-                Log.e("Update Timetable","WEEK TWO IS EQUAL");
+                //Log.e("Update Timetable","WEEK TWO IS EQUAL");
                 testifequal++;
             }
             if(inSQL.a[1].equals(classPref)){
-                Log.e("Update Timetable","CLASS IS EQUAL");
+                //Log.e("Update Timetable","CLASS IS EQUAL");
+
                 testifequal++;
+            }else {
+                TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
+                dbgroups.removeAll();
+                dbgroups.close();
             }
             if(inSQL.b[1].equals(classPref)){
-                Log.e("Update Timetable","CLASS IS EQUAL");
+                //Log.e("Update Timetable","CLASS IS EQUAL");
+
                 testifequal++;
+            }else{
+                TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
+                dbgroups.removeAll();
+                dbgroups.close();
             }
         }
 
         if(testifequal == 4){
-            Log.e("Update Timetable","Not updating.");
+            Log.e("Update Timetable: ","Not updating.");
             return;
-        }Log.e("Update Timetable","Updating.");
+        }Log.e("Update Timetable: ","Updating.");
 
         String msg = "Stundenplanplan erfolgreich neu geladen!";
         if(classPref.length() > 0 && Integer.parseInt(classPref) > 0){
@@ -118,6 +124,9 @@ public class UpdateTimetable extends IntentService {
                 Timetable Plan = new Timetable(weeks[0],"c",Integer.parseInt(classPref),studentUSERNAMEPref,studentPASSWORDPref);
                 Plan.update();
                 Plan.print();
+                TplanDatabaseHelper dbplan = new TplanDatabaseHelper(getApplicationContext());
+                dbplan.removeAll();
+                dbplan.close();
                 Plan.addToSQL(this);
                 db.removeAll();
                 String weekname = "A";

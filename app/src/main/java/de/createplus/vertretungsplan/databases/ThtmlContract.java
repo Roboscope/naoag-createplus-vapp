@@ -2,13 +2,7 @@ package de.createplus.vertretungsplan.databases;
 
 import android.provider.BaseColumns;
 
-/**
- * TODO: MISSING JAVADOC
- *
- * @author Roboscope
- * @version 1.0
- * @since 2017-02-10
- */
+
 public class ThtmlContract {
 
 
