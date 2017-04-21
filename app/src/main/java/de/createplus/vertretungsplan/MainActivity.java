@@ -480,9 +480,10 @@ public class MainActivity extends AppCompatActivity
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
+                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        tw.setText(tmp[o]);
+                        tw.setText(tmp[o].replace(" ",""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
                     }
@@ -493,9 +494,10 @@ public class MainActivity extends AppCompatActivity
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
+                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        tw.setText(tmp[o]);
+                        tw.setText(tmp[o].replace(" ",""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
                     }
@@ -541,9 +543,11 @@ public class MainActivity extends AppCompatActivity
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
+                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
+                        Log.e("O","|"+tmp[o]+"|");
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        tw.setText(tmp[o]);
+                        tw.setText(tmp[o].replace(" ",""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
                     }
@@ -554,9 +558,11 @@ public class MainActivity extends AppCompatActivity
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
+                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        tw.setText(tmp[o]);
+                        Log.e("O","|"+tmp[o]+"|");
+                        tw.setText(tmp[o].replace(" ",""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
                     }

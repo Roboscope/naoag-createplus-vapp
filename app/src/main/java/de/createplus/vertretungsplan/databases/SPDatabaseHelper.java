@@ -212,4 +212,99 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
         return arrayParents;
     }
 
+
+    public String test() {
+        String[] projection = {
+                SPContract.SPEntry.COLUMN_NAME_CLASS,
+                SPContract.SPEntry.COLUMN_NAME_HOUR,
+                SPContract.SPEntry.COLUMN_NAME_COURSE,
+                SPContract.SPEntry.COLUMN_NAME_KIND,
+                SPContract.SPEntry.COLUMN_NAME_ROOM
+        };
+
+        String selection = SPContract.SPEntry.COLUMN_NAME_DATE + " > ?";
+        String[] selectionArgs = {"0"};
+
+        String sortOrder =
+                SPContract.SPEntry.COLUMN_NAME_CLASS + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                SPContract.SPEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        String result = "";
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                result += cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_CLASS)) + " | " + cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_HOUR)) + " | " + cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_COURSE)) + " | " + cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_KIND)) + " | " + cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_ROOM)) + "\n";
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return result;
+    }
+
+
+    public String getDates() {
+        String[] ret = new String[2];
+
+        String[] projection = {
+                SPContract.SPEntry.COLUMN_NAME_CLASS,
+                SPContract.SPEntry.COLUMN_NAME_HOUR,
+                SPContract.SPEntry.COLUMN_NAME_COURSE,
+                SPContract.SPEntry.COLUMN_NAME_KIND,
+                SPContract.SPEntry.COLUMN_NAME_ROOM,
+                SPContract.SPEntry.COLUMN_NAME_DATE,
+                SPContract.SPEntry.COLUMN_NAME_NEWROOM,
+                SPContract.SPEntry.COLUMN_NAME_TEXT,
+                SPContract.SPEntry.COLUMN_NAME_PLANINFO,
+        };
+
+
+        String selection = SPContract.SPEntry._ID + " > ?";
+        String[] selectionArgs = {"0"};
+
+
+        String sortOrder =
+                SPContract.SPEntry.COLUMN_NAME_DATE + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                SPContract.SPEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        ArrayList<Parent> arrayParents = new ArrayList<Parent>();
+        //ArrayList<String> arrayChildren = new ArrayList<String>();
+        ArrayList<String> arrayChildren = null;
+        Parent currentparent = null;
+
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+
+                String CLASS = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_CLASS)),
+                        HOUR = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_HOUR)),
+                        COURSE = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_COURSE)),
+                        KIND = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_KIND)),
+                        ROOM = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_ROOM)),
+                        DATE = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_DATE)),
+                        NEWROOM = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_NEWROOM)),
+                        TEXT = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_TEXT)),
+                        PLANINFO = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_PLANINFO));
+
+            } while (cursor.moveToNext());
+
+            cursor.close();
+        }
+        return ret;
+    }
+
 }

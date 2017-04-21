@@ -125,7 +125,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         for(int i = 0; i < tmp.length;i++){
             wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME,val,TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?",  new String[]{tmp[i]});
         }
-        MainActivity.THIS.updateContainerContent();
+
+        //MainActivity.THIS.updateContainerContent();
     }
 
     protected static void setListPreferenceDataCLASS(ListPreference lp) {
