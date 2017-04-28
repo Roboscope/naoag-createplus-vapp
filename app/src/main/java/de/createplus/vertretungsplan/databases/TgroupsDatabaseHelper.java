@@ -17,12 +17,11 @@ import java.util.LinkedList;
 
 public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "timetablegroups.db";
-    private static final int DATABASE_VERSION = 10;
+    private static final int DATABASE_VERSION = 12;
 
     private static final String SQL_CREATE_TABLE =
             "CREATE TABLE " + TgroupsContract.TgroupsEntry.TABLE_NAME + " (" +
                     TgroupsContract.TgroupsEntry._ID + " INTEGER PRIMARY KEY," +
-                    TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " TEXT," +
                     TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " TEXT," +
                     TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED + " INTEGER)";
 
@@ -54,14 +53,10 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public void addLine(String group, String course, boolean enabled) {
-        int enabledInt = 0;
-        if(enabled){
-            enabledInt = 1;
-        }
+    public void addLine(String course, boolean enabled) {
+        Log.e("ADDING",course+"|"+enabled);
         ContentValues values = new ContentValues();
 
-        values.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP, group);
         values.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE, course);
         values.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED, enabled);
 
@@ -72,48 +67,10 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
         this.getWritableDatabase().execSQL(SQL_DELETE_ENTRIES);
     }
 
-    public String[] getCourse(String course){
-        String[] projection = {
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP,
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE,
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
-        };
-        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?";
-        String[] selectionArgs = {course};
-
-        String sortOrder =
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " ASC";
-
-        Cursor cursor = this.getReadableDatabase().query(
-                TgroupsContract.TgroupsEntry.TABLE_NAME,
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder
-        );
-        String[] tmp = new String[3];
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            do {
-
-                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP));
-                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
-                tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
-                Log.e("GROUPS", Arrays.toString(tmp));
-
-            } while (cursor.moveToNext());
-            cursor.close();
-        }
-        return tmp;
-    }
-
-    public LinkedList<String[]> getAllGroups()  {
+    public LinkedList<String[]> getAllCourses()  {
         LinkedList<String[]> ret = new LinkedList<String[]>();
 
         String[] projection = {
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP,
                 TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE,
                 TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
         };
@@ -122,7 +79,7 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
         String[] selectionArgs = {"0"};
 
         String sortOrder =
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " ASC";
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " ASC";
 
         Cursor cursor = this.getReadableDatabase().query(
                 TgroupsContract.TgroupsEntry.TABLE_NAME,
@@ -137,11 +94,10 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                String[] tmp = new String[3];
-                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP));
-                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
-                tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
-                Log.e("GROUPS", Arrays.toString(tmp));
+                String[] tmp = new String[2];
+                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
+                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
+                Log.e("getAll", Arrays.toString(tmp));
                 ret.add(tmp);
             } while (cursor.moveToNext());
             cursor.close();
@@ -149,19 +105,18 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
         return ret;
     }
 
-    public String getEnabledCourseOfGroup(String group) {
+    public boolean getCourseState(String course) {
         //Log.e("GROUPS", group);
         String[] projection = {
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP,
                 TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE,
                 TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
         };
 
-        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " = ?";
-        String[] selectionArgs = {group};
+        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?";
+        String[] selectionArgs = {course};
 
         String sortOrder =
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " ASC";
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " ASC";
 
         Cursor cursor = this.getReadableDatabase().query(
                 TgroupsContract.TgroupsEntry.TABLE_NAME,
@@ -172,38 +127,34 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
                 null,
                 sortOrder
         );
-
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                String[] tmp = new String[3];
-                tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP));
-                tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
-                tmp[2] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
-                //Log.e("GROUPS", Arrays.toString(tmp) + " ----------" +Integer.parseInt(tmp[2]));
-                if(Integer.parseInt(tmp[2]) == 1){
-                    Log.e(group, Arrays.toString(tmp));
-                    return tmp[1];
+                String tmp = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
+                Log.e("getCourseState",tmp);
+                if (Integer.parseInt(tmp) == 1) {
+                    return true;
                 }
+                cursor.close();
+                return false;
 
             } while (cursor.moveToNext());
-            cursor.close();
+
         }
-        return null;
+        return false;
     }
 
     public boolean doesExist(String group) {
         String[] projection = {
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP,
                 TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE,
                 TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED
         };
 
-        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP+ " = ?";
+        String selection = TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE+ " = ?";
         String[] selectionArgs = {group};
 
         String sortOrder =
-                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSEGROUP + " ASC";
+                TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " ASC";
 
         Cursor cursor = this.getReadableDatabase().query(
                 TgroupsContract.TgroupsEntry.TABLE_NAME,
@@ -214,15 +165,15 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
                 null,
                 sortOrder
         );
-        boolean ret = false;
+
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                ret = true;
+                return true;
             } while (cursor.moveToNext());
-            cursor.close();
+            //cursor.close();
         }
-        return ret;
+        return false;
     }
 
 }

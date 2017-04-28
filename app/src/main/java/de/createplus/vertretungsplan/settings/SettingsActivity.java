@@ -67,7 +67,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         }
 
         TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
-        LinkedList<String[]> coursesall = dbgroups.getAllGroups();
+        LinkedList<String[]> coursesall = dbgroups.getAllCourses();
         if(coursesall.size() > 0) {
             final MultiSelectListPreference listPreference = (MultiSelectListPreference) findPreference(KEY_COURSE_SELECTION);
             setListPreferenceDataCOURSE(listPreference,coursesall);
@@ -109,24 +109,24 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED,"0");
         wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME,val,TgroupsContract.TgroupsEntry._ID + " > ?",  new String[]{"0"});
 
-
-        String[] tmp = new String[courseSET.size()];
-        int o = 0;
-        for (String i : courseSET){
-            //Log.e("GROUP SET TO TRUE",i);
-            tmp[o] = i;
-            o++;
-        }
-        for(int i = 0; i < tmp.length; i++){
+        if(courseSET != null){
+            String[] tmp = new String[courseSET.size()];
+            int o = 0;
+            for (String i : courseSET){
+                //Log.e("GROUP SET TO TRUE",i);
+                tmp[o] = i;
+                o++;
+            }
+        /*for(int i = 0; i < tmp.length; i++){
             tmp[i] = tmp[i].split("SPLITPOINT")[1];
+        }*/
+            val = new ContentValues();
+            val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED,"1");
+            for(int i = 0; i < tmp.length;i++){
+                wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME,val,TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?",  new String[]{tmp[i]});
+            }
+            MainActivity.THIS.updateContainerContent();
         }
-        val = new ContentValues();
-        val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED,"1");
-        for(int i = 0; i < tmp.length;i++){
-            wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME,val,TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?",  new String[]{tmp[i]});
-        }
-
-        //MainActivity.THIS.updateContainerContent();
     }
 
     protected static void setListPreferenceDataCLASS(ListPreference lp) {
@@ -151,11 +151,10 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         for(int i = 0; 0 < in.size();i++){
             String[] tmp = in.remove();
-            entries[i] = tmp[1];
-            entryValues[i] = tmp[0] + "SPLITPOINT" + tmp[1] + "SPLITPOINT" + tmp[2];
-            if(Integer.parseInt(tmp[2])==1){
-                dafaultValues.add(tmp[0] + "SPLITPOINT" + tmp[1] + "SPLITPOINT" + tmp[2]);
-
+            entries[i] = tmp[0];
+            entryValues[i] = tmp[0];
+            if(Integer.parseInt(tmp[1])==1){
+                dafaultValues.add(tmp[0]);
             }
         }
         //Log.e("ADDING",""+ dafaultValues);

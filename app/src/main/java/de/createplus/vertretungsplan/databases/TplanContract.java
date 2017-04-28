@@ -14,6 +14,9 @@ public class TplanContract {
         public static final String COLUMN_NAME_WEEK = "week";
         public static final String COLUMN_NAME_DAY = "day";
         public static final String COLUMN_NAME_HOUR = "hour";
+        public static final String COLUMN_NAME_COURSE  = "course";
         public static final String COLUMN_NAME_COURSEGROUP  = "coursegroup";
+        public static final String COLUMN_NAME_TEACHER  = "teacher";
+        public static final String COLUMN_NAME_ROOM  = "room";
     }
 }

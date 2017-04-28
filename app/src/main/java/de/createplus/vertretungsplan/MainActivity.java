@@ -3,6 +3,7 @@ package de.createplus.vertretungsplan;
 import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -44,6 +45,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
+import java.security.Permission;
 import java.sql.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -67,6 +69,7 @@ import de.createplus.vertretungsplan.databases.TplanContract;
 import de.createplus.vertretungsplan.databases.TplanDatabaseHelper;
 import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 import de.createplus.vertretungsplan.listview.Parent;
+import de.createplus.vertretungsplan.permissionMngr.PermissionRequest;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 import static android.Manifest.permission.INTERNET;
@@ -130,7 +133,6 @@ public class MainActivity extends AppCompatActivity
 
         updateContainerContent();
         setupInterstitial();
-
     }
 
     private void setupBackgoundtasks() {
@@ -447,11 +449,11 @@ public class MainActivity extends AppCompatActivity
         TableLayout LayoutTomorrow = (TableLayout) findViewById(R.id.overview_tablelayout_inner_B);
         TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
         TplanDatabaseHelper dbplan = new TplanDatabaseHelper(getApplicationContext());
-        LinkedList<String[]> FullTimetable = dbplan.getPlan();
+        LinkedList<String[]> FullTimetable = dbplan.getPlan(getApplicationContext());
 
         TextView TitleToday1 = (TextView) findViewById(R.id.overview_textview_titleA1);
         TextView TitleToday2 = (TextView) findViewById(R.id.overview_textview_titleA2);
-        TitleToday1.setText("Heute: " + days[TodayDay] + ",");
+        TitleToday1.setText(days[TodayDay] + ",");
         TitleToday2.setText(TodayDate);
         TitleToday1.setTextSize(tiltesize);
         TitleToday2.setTextSize(tiltesize);
@@ -463,7 +465,14 @@ public class MainActivity extends AppCompatActivity
                 String[] tmp = {currentItem[1], currentItem[2], currentItem[3]};
                 if (Integer.parseInt(currentItem[1]) == TodayDay + 1) {
                     //Log.e("Day",""+Integer.parseInt(currentItem[1]));
-                    TodayEntries[Integer.parseInt(currentItem[2])] = dbgroups.getEnabledCourseOfGroup(currentItem[3]);
+                    TodayEntries[Integer.parseInt(currentItem[2])] = currentItem[4] + " " + currentItem[5] + " " + currentItem[6];
+                    /*tmp[0] = COLUMN_NAME_WEEK
+                    tmp[1] = COLUMN_NAME_DAY
+                    tmp[2] = COLUMN_NAME_HOUR
+                    tmp[3] = COLUMN_NAME_COURSEGROUP
+                    tmp[4] = COLUMN_NAME_COURSE
+                    tmp[5] = COLUMN_NAME_TEACHER
+                    tmp[6] = COLUMN_NAME_ROOM*/
                 }
             }
         }
@@ -512,7 +521,7 @@ public class MainActivity extends AppCompatActivity
         //----------------------------------------------------------------------------
         TextView TitleTomorrow1 = (TextView) findViewById(R.id.overview_textview_titleB1);
         TextView TitleTomorrow2 = (TextView) findViewById(R.id.overview_textview_titleB2);
-        TitleTomorrow1.setText("Morgen: " + days[TomorrowDay] + ",");
+        TitleTomorrow1.setText(days[TomorrowDay] + ",");
         TitleTomorrow2.setText(TomorrowDate);
         TitleTomorrow1.setTextSize(tiltesize);
         TitleTomorrow2.setTextSize(tiltesize);
@@ -526,7 +535,7 @@ public class MainActivity extends AppCompatActivity
                 //Log.e("Day",""+Integer.parseInt(currentItem[1])+":"+TomorrowDay);
                 if (Integer.parseInt(currentItem[1]) == TomorrowDay + 1) {
                     //Log.e("Day",""+Integer.parseInt(currentItem[1]));
-                    TomorrowEntries[Integer.parseInt(currentItem[2])] = dbgroups.getEnabledCourseOfGroup(currentItem[3]);
+                    TomorrowEntries[Integer.parseInt(currentItem[2])] = currentItem[4] + " " + currentItem[5] + " " + currentItem[6];
                 }
             }
         }

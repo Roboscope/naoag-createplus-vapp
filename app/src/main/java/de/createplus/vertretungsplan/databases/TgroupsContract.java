@@ -11,7 +11,6 @@ public class TgroupsContract {
     /* Inner class that defines the table contents */
     public static class TgroupsEntry implements BaseColumns {
         public static final String TABLE_NAME = "timetablegroups";
-        public static final String COLUMN_NAME_COURSEGROUP = "coursegroup";
         public static final String COLUMN_NAME_COURSE = "course";
         public static final String COLUMN_NAME_ENABLED = "enabled";
     }

@@ -3,7 +3,7 @@ package de.createplus.vertretungsplan.backgroundservices;
 import java.util.Arrays;
 
 /**
- * Created by Max Nuglisch LOKAL on 05.04.2017.
+ * Created by Max Nuglisch on 05.04.2017.
  */
 
 public class Pair {

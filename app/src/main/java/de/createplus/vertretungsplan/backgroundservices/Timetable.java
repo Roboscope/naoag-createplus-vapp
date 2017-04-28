@@ -154,7 +154,6 @@ public class Timetable {
 
                 //if line is FREE or PAUSE -> add it and go 2 line further
                 }else if(tmp.equals("PAUSE")||tmp.equals("FREE")){
-                    if(tmp.equals("PAUSE")) tmp = "PAUSE% - -";
                     plan[row][i] = tmp;
                     currentLine++;
                     currentLine++;
@@ -247,42 +246,19 @@ public class Timetable {
         TplanDatabaseHelper dbplan = new TplanDatabaseHelper(context);
 
 
-
-
         for(int day = 1; day <6; day++){
             for(int hour = 1; hour < 12; hour++){
                 String tmp = plan[hour][day];
                 if(tmp != null && tmp != "FREE" && tmp != "PAUSE"){
+                    String[] parts = tmp.split("%");// LK08%COURSES
 
-                    Matcher m = Pattern.compile("[^ ]+% [0-9]+ ").matcher(tmp);
-                    //Log.e("TimetableToSQL","created group: " + parts[0]);
+                    Matcher m = Pattern.compile(" [^ ]+ [^ ]+ [^ ]+").matcher(parts[1]);
                     while(m.find()){
-                        String tmpin = m.group();
-                        tmp = tmp.replace(tmpin,"AG% ");
-                        Log.e("Anti AG","replaced " +tmpin);
-                    }
-                    String[] parts = tmp.split("%");
-                    //Log.e("TimetableToSQL",tmp);
-                    dbplan.addLine(Integer.parseInt(date.split("[\\(\\)]")[3]), day, hour, parts[0]);
-                    if(!dbgroups.doesExist(parts[0])){
-
-                        m = Pattern.compile(" [^ ]+ [^ ]+ [^ ]+").matcher(parts[1]);
-                        //Log.e("TimetableToSQL","created group: " + parts[0]);
-                        while(m.find()){
-                            String tmpin = m.group();
-                            dbgroups.addLine(parts[0],tmpin,false);
-                            //Log.e("TimetableToSQL","added: " + tmpin);
+                        String tmpin[] = m.group().split(" ");// E3 AD 506
+                        if(!dbgroups.doesExist(tmpin[1])){
+                            dbgroups.addLine(tmpin[1],false);
                         }
-                        if(Pattern.matches("[^ ]+% [^ ]+ [^ ]+",  tmp)){
-                            String tmpin=tmp.replace("%","");
-                            dbgroups.addLine(parts[0],tmpin,true);
-                        }
-                        //Log.e("TimetableToSQL","created group: " + parts[0]);
-                        while(m.find()){
-                            String tmpin = m.group();
-                            dbgroups.addLine(parts[0],tmpin,false);
-                            //Log.e("TimetableToSQL","added: " + tmpin);
-                        }
+                        dbplan.addLine(Integer.parseInt(date.split("[\\(\\)]")[3]), day, hour, tmpin[1] ,parts[0],tmpin[2],tmpin[3]);
                     }
                 }
             }

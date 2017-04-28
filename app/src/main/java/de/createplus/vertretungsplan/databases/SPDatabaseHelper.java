@@ -213,7 +213,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public String test() {
+    /*public String test() {
         String[] projection = {
                 SPContract.SPEntry.COLUMN_NAME_CLASS,
                 SPContract.SPEntry.COLUMN_NAME_HOUR,
@@ -246,10 +246,10 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return result;
-    }
+    }*/
 
 
-    public String getDates() {
+  /*  public String getDates() {
         String[] ret = new String[2];
 
         String[] projection = {
@@ -305,6 +305,6 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return ret;
-    }
+    }*/
 
 }
