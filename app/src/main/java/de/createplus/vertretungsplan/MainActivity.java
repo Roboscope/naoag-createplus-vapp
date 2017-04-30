@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity
     static public int TomorrowDay;
     static public String[] days = {"Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"};
     static public MainActivity THIS;
+    static public boolean updating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,8 +117,11 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onClick(View view) {
-                Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
-                MainActivity.this.startService(mServiceIntent);
+                if(!updating){
+                    updating = true;
+                    Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+                    MainActivity.this.startService(mServiceIntent);
+                }
             }
         });
 

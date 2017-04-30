@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.LinkedList;
 
 import de.createplus.vertretungsplan.listview.Parent;
 
@@ -211,6 +212,95 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
         }
         return arrayParents;
     }
+
+
+    public LinkedList<String[]> getSPinfo(String Class, String Course) {
+        LinkedList<String[]> ret = new LinkedList<String[]>();
+        String[] projection = {
+                SPContract.SPEntry.COLUMN_NAME_CLASS,
+                SPContract.SPEntry.COLUMN_NAME_HOUR,
+                SPContract.SPEntry.COLUMN_NAME_COURSE,
+                SPContract.SPEntry.COLUMN_NAME_KIND,
+                SPContract.SPEntry.COLUMN_NAME_ROOM,
+                SPContract.SPEntry.COLUMN_NAME_DATE,
+                SPContract.SPEntry.COLUMN_NAME_NEWROOM,
+                SPContract.SPEntry.COLUMN_NAME_TEXT,
+                SPContract.SPEntry.COLUMN_NAME_PLANINFO,
+        };
+
+
+        String selection = SPContract.SPEntry._ID + " > ?";
+        String[] selectionArgs = {"0"};
+
+
+        String sortOrder =
+                SPContract.SPEntry.COLUMN_NAME_CLASS + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                SPContract.SPEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+
+
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+
+                String CLASS = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_CLASS)),
+                        HOUR = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_HOUR)),
+                        COURSE = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_COURSE)),
+                        KIND = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_KIND)),
+                        ROOM = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_ROOM)),
+                        DATE = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_DATE)),
+                        NEWROOM = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_NEWROOM)),
+                        TEXT = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_TEXT)),
+                        PLANINFO = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_PLANINFO));
+                String[] CLASSSPLIT = CLASS.split(" ");
+                CLASS = CLASSSPLIT[CLASSSPLIT.length-1];
+                String ClassOnly = CLASS.split("-")[0];
+                if(ClassOnly.equals(Class)){
+                    if(COURSE.toUpperCase().replace(" ","").equals(Course.toUpperCase().replace(" ",""))){
+                        String[] retin = new String[6];
+                        retin[0] = KIND;
+                        retin[1] = HOUR;
+                        retin[2] = ROOM;
+                        retin[3] = DATE;
+                        retin[4] = NEWROOM;
+                        retin[5] = TEXT;
+                        ret.add(retin);
+                    }
+                }
+
+               /*
+                    String out = "";
+                    if(KIND.equals("Sondereins.")){
+                        out = TEXT + " " + " in der " + HOUR + " Stunde   \nRaum: " + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
+                    }else{
+                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
+                    }
+                    arrayChildren.add(out);
+
+                    String out = "";
+                    if(KIND.equals("Sondereins.")){
+                        out = TEXT + " " + " in der " + HOUR + " Stunde   \nRaum: " + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
+                    }else{
+                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
+                    }
+                    arrayChildren.add(out);
+                */
+            } while (cursor.moveToNext());
+
+            cursor.close();
+        }
+        return ret;
+    }
+
+
 
 
     /*public String test() {

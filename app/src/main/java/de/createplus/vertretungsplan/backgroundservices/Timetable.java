@@ -67,46 +67,70 @@ public class Timetable {
 
         Whitelist wl = Whitelist.simpleText();
         wl.addTags("b");
-        List<String> planList= new LinkedList<String>();
+        wl.addTags("td");
+        wl.addTags("tr");
+        Whitelist w2 = Whitelist.simpleText();
+        w2.addTags("b");
+
+        List<String> planList = new LinkedList<String>();
 
         //select rows
         org.jsoup.select.Elements rows = doc.select("tr");
 
         //going through rows
-        for(org.jsoup.nodes.Element row :rows) {
-
+        for (org.jsoup.nodes.Element row : rows) {
+            //System.out.println(":"+row.html());
             //select columns
+            //System.out.println(":"+row.html());
+            //System.out.println(":"+row.html());
             org.jsoup.select.Elements columns = row.select("td");
 
             //going through columns
-            for (org.jsoup.nodes.Element column:columns) {
+            for (org.jsoup.nodes.Element column : columns) {
+                //System.out.println(":"+);
+                String outer = column.outerHtml();
 
-                if(column.text().contains(" ")){ //selecting valid information
+
+                if (column.text().contains(" ")) { //selecting valid information
 
                     //if field has a blod marked text -> mark it with a % char
                     String tmp = column.text();
-                    String tmp2 =  Jsoup.clean(column.html(),wl);
-                    if(Pattern.matches( "<b>[^ ]+</b>.+",  tmp2)){
-                        tmp2 = tmp2.replace("<b>","");
-                        tmp = tmp.substring(0,tmp2.indexOf("</b>"))+"%"+tmp.substring(tmp2.indexOf("</b>"),tmp.length());
+                    String tmp2 = Jsoup.clean(column.html(), w2);
+                    String tmp3 = Jsoup.clean(column.html(), wl);
+
+                    int end = tmp3.indexOf("</tr>");
+                    if (end > 0 && Pattern.matches("<tr><td><b>[^<]+</b></td><td>[^<]+</td>", tmp3.substring(0,end).replace("\n", "").replace(" ", ""))) {
+                        String Title = Jsoup.clean(tmp3.substring(0, end), new Whitelist()).replace("   "," ");
+                        tmp = tmp.replace(Title,Title+"%");
+                    }else if (Pattern.matches("<b>[^ ]+</b>.+", tmp2)) {
+                        tmp2 = tmp2.replace("<b>", "");
+                        tmp = tmp.substring(0, tmp2.indexOf("</b>")) + "%" + tmp.substring(tmp2.indexOf("</b>"), tmp.length());
                     }
 
+                    if (outer.indexOf("rowspan=\"") > 0) {
+                        String size = outer.substring(outer.indexOf("rowspan=\""), outer.indexOf("rowspan=\"") + 10).replace("rowspan=\"", "");
+                        if (Integer.parseInt(size) == 4) {
+                            tmp = "[SIZE:4]" + tmp;
+                        }
+
+                    }
                     planList.add(tmp);
                 }
-                if(column.text().length() == 0){//if field is empty -> FREE
+                if (column.text().length() == 0) {//if field is empty -> FREE
                     planList.add("FREE");
                 }
-                if(Pattern.matches( "[0-9][0-9]?",  column.text())){ // if field contains an hout indicator -> add it
+                if (Pattern.matches("[0-9][0-9]?", column.text())) { // if field contains an hout indicator -> add it
                     planList.add("Indicator:" + column.text());
+                    //System.out.println(":"+column.html());
                 }
-                if(column.text().equals("Pause")){ // if field contains pause -> add Pause
+                if (column.text().equals("Pause")) { // if field contains pause -> add Pause
                     planList.add("PAUSE");
                 }
             }
         }
-        /*for(int i = 0; i<planList.size();i++){
+        for (int i = 0; i < planList.size(); i++) {
             System.out.println(planList.get(i));
-        }*/
+        }
 
         // creating array
         plan = new String[12][6];
@@ -121,48 +145,52 @@ public class Timetable {
         int currentLine = 0; //line iterator index
 
 
-        for(int row = 1; row < plan.length; row++){
+        for (int row = 1; row < plan.length; row++) {
             currentIndicator++;
 
             //go to next Indicator mark
-            while(!planList.get(currentLine).equals("Indicator:"+currentIndicator)) currentLine++;
+            while (!planList.get(currentLine).equals("Indicator:" + currentIndicator)) currentLine++;
             currentLine++;
             currentLine++;
 
 
-            plan[row][0] = ""+currentIndicator;
+            plan[row][0] = "" + currentIndicator;
 
 
-            for(int i = 1;i<plan[0].length;i++){
+            for (int i = 1; i < plan[0].length; i++) {
 
                 // the next lines only exsists because of the very good system of our school. not.
-                if((row == 11 || row == 9 ||row == 6 )&& i<plan[0].length-1 && (plan[5][i] == "FREE" || plan[5][i] == null || Pattern.matches("[^ ]+ [^ ]+ [^ ]+ .+", plan[5][i]))){
+                /*if((row == 11 || row == 9 ||row == 6 )&& i<plan[0].length-1 && (plan[5][i] == "FREE" || plan[5][i] == null || Pattern.matches("[^ ]+ [^ ]+ [^ ]+ .+", plan[5][i]))){
                     i++;
                     //System.out.println("Done");
-                }
+                }*/
 
                 // get string from list
                 String tmp;
-                if(i < planList.size()){
+                if (i < planList.size()) {
                     tmp = planList.get(currentLine);
-                }else break;
+                } else break;
 
                 //if line is a Timetable object
-                if(Pattern.matches("[^ ]+ [^ ]+ [^ ]+.+",  tmp)){
-                    plan[row][i] = tmp;
+                if (Pattern.matches("[^ ]+ [^ ]+ [^ ]+.+", tmp)) {
+                    if (row == 2 || row == 4 || row == 6 || row == 8 || row == 10) {
+                        while (plan[row - 1][i] != null && plan[row - 1][i].contains("[SIZE:4]")) {
+                            i++;
+                        }
+                    }
+                    plan[row][i] = tmp.replace("[SIZE:4]", "");
                     currentLine++;
 
-                //if line is FREE or PAUSE -> add it and go 2 line further
-                }else if(tmp.equals("PAUSE")||tmp.equals("FREE")){
+                    //if line is FREE or PAUSE -> add it and go 2 line further
+                } else if (tmp.equals("PAUSE") || tmp.equals("FREE")) {
                     plan[row][i] = tmp;
                     currentLine++;
                     currentLine++;
-                //if an hour indicator appears -> break the loop
-                }else if(tmp.equals("Indicator:"+currentIndicator))break;
+                    //if an hour indicator appears -> break the loop
+                } else if (tmp.equals("Indicator:" + currentIndicator)) break;
 
-                //if the information is not usable it just skips it
+                    //if the information is not usable it just skips it
                 else currentLine++;
-
             }
         }
     }
@@ -251,7 +279,13 @@ public class Timetable {
                 String tmp = plan[hour][day];
                 if(tmp != null && tmp != "FREE" && tmp != "PAUSE"){
                     String[] parts = tmp.split("%");// LK08%COURSES
-
+                    if(Pattern.matches("[^ %]+% [^ ]+ [^ ]+", tmp)){// E% AD 506
+                        if(!dbgroups.doesExist(parts[0])){
+                            dbgroups.addLine(parts[0],true);
+                        }
+                        String tmpin[] = parts[1].split(" ");// AD 506
+                        dbplan.addLine(Integer.parseInt(date.split("[\\(\\)]")[3]), day, hour, parts[0] ,parts[0],tmpin[1],tmpin[2]);
+                    }
                     Matcher m = Pattern.compile(" [^ ]+ [^ ]+ [^ ]+").matcher(parts[1]);
                     while(m.find()){
                         String tmpin[] = m.group().split(" ");// E3 AD 506

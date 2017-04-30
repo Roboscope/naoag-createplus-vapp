@@ -147,5 +147,17 @@
         ads:adSize="BANNER"
         ads:adUnitId="ca-app-pub-1455056966789635/1379071109"></com.google.android.gms.ads.AdView>
 
+    <Button
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/adBanner"
+        android:layout_alignStart="@+id/adBanner"
+        android:id="@+id/button2"
+        android:drawableStart="@drawable/info_button"
+        android:background="@android:color/background_light"
+        android:fadingEdge="none"
+        android:enabled="false"
+        android:layout_width="20dp"
+        android:layout_height="20dp" />
+
 
 </RelativeLayout>

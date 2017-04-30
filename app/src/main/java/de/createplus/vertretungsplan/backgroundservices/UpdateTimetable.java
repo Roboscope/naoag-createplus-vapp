@@ -133,7 +133,11 @@ public class UpdateTimetable extends IntentService {
                 if(weeks[0]%2 > 0){
                     weekname = "B";
                 }
-                db.addLine(weeks[0]+"",classPref,Plan.getHtml().replace("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">", "<font size=\"7\" face=\"Arial\" color=\"#0000FF\">" + weekname +":"));
+                if(Plan.getHtml() != null){
+                    db.addLine(weeks[0]+"",classPref,Plan.getHtml().replace("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">", "<font size=\"7\" face=\"Arial\" color=\"#0000FF\">" + weekname +":"));
+                }
+
+
 
             }catch (IOException e){
                 msg = "Download Error (Plan für: "+ weekCurrent[1] +")";
@@ -147,12 +151,18 @@ public class UpdateTimetable extends IntentService {
                 Timetable Plan = new Timetable(weeks[1],"c",Integer.parseInt(classPref),studentUSERNAMEPref,studentPASSWORDPref);
                 Plan.update();
                 Plan.print();
+
                 Plan.addToSQL(this);
+
                 String weekname = "A";
                 if(weeks[1]%2 > 0){
                     weekname = "B";
                 }
-                db.addLine(weeks[1]+"",classPref,Plan.getHtml().replace("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">", "<font size=\"7\" face=\"Arial\" color=\"#0000FF\">" + weekname +":"));
+                if(Plan.getHtml() != null){
+                    db.addLine(weeks[1]+"",classPref,Plan.getHtml().replace("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">", "<font size=\"7\" face=\"Arial\" color=\"#0000FF\">" + weekname +":"));
+                }
+
+
 
             }catch (IOException e){
                 msg = "Download Error (Vertretungsplan für: "+ weekNext[1] +")";
