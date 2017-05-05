@@ -69,13 +69,15 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="pref_key_ad_settings_screem"
-        android:title="Werbung">
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_key_ad_status"
-            android:summary="Eine Möglichkeit mich zusätzlich zu unterstützen."
-            android:title="Werbung überall anzeigen" />
+        android:key="pref_key_view_settings_screem"
+        android:title="Ansicht">
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/defaultSiteName"
+            android:entryValues="@array/defaultSiteValue"
+            android:key="pref_key_list_defaultview"
+            android:title="Startseite"
+            android:summary="Die Seite die beim Starten der App geöffnet ist."/>
     </PreferenceCategory>
 
 </PreferenceScreen>

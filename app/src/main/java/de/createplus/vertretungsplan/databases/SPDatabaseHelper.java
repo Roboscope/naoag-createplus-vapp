@@ -2,16 +2,21 @@ package de.createplus.vertretungsplan.databases;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 import de.createplus.vertretungsplan.listview.Parent;
+import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 
 /**
@@ -120,7 +125,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public ArrayList<Parent> getPlan(String date) {
+    public ArrayList<Parent> getPlan(String date,Context context) {
         String[] projection = {
                 SPContract.SPEntry.COLUMN_NAME_CLASS,
                 SPContract.SPEntry.COLUMN_NAME_HOUR,
@@ -154,7 +159,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
         //ArrayList<String> arrayChildren = new ArrayList<String>();
         ArrayList<String> arrayChildren = null;
         Parent currentparent = null;
-
+        //Log.e("HI", "BINDA");
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
@@ -169,7 +174,8 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
                         TEXT = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_TEXT)),
                         PLANINFO = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_PLANINFO));
                 String[] CLASSSPLIT = CLASS.split(" ");
-                CLASS = CLASSSPLIT[CLASSSPLIT.length-1];
+                //Log.e("HI", Arrays.toString(CLASSSPLIT));
+                CLASS = CLASSSPLIT[CLASSSPLIT.length - 1];
                 //Log.e("VERTRETUNGSPLAN", ""+DATE);
                 //Log.e("VERTRETUNGSPLANPARENT", currentparent.getTitle());
                 if (currentparent == null) {
@@ -188,23 +194,15 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
 
                     currentparent = new Parent();
                     currentparent.setTitle(CLASS);
-                    String out = "";
-                    if(KIND.equals("Sondereins.")){
-                        out = TEXT + " " + " in der " + HOUR + " Stunde   \nRaum: " + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
-                    }else{
-                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
-                    }
-                    arrayChildren.add(out);
+
+
+                    arrayChildren.add(getText(HOUR,COURSE,KIND,ROOM,NEWROOM,TEXT,context));
                 } else {
-                    String out = "";
-                    if(KIND.equals("Sondereins.")){
-                        out = TEXT + " " + " in der " + HOUR + " Stunde   \nRaum: " + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
-                    }else{
-                        out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
-                    }
-                    arrayChildren.add(out);
+
+                    arrayChildren.add(getText(HOUR,COURSE,KIND,ROOM,NEWROOM,TEXT,context));
                 }
-            } while (cursor.moveToNext());
+            }
+            while (cursor.moveToNext());
             currentparent.setArrayChildren(arrayChildren);
             arrayParents.add(currentparent);
 
@@ -213,8 +211,26 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
         return arrayParents;
     }
 
+    private String getText(String HOUR, String COURSE, String KIND, String ROOM, String NEWROOM, String TEXT,Context context) {
+        String out = "";
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean teacherMode = sharedPref.getBoolean(SettingsActivity.KEY_TEACHERMODE, false);
+        if (teacherMode) {
+            out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " (" + NEWROOM + " fehlt) SPLITPOINT " + TEXT;
+        }else{
+            if (KIND.equals("Sondereins.")) {
+                out = TEXT + " " + " in der " + HOUR + " Stunde   \nRaum: " + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
+            } else {
+                out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   \nRaum: " + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
+            }
+        }
 
-    public LinkedList<String[]> getSPinfo(String Class, String Course) {
+
+        return out;
+    }
+
+
+    public LinkedList<String[]> getSPinfo(String Class, String Course, String Date, int Hour) {
         LinkedList<String[]> ret = new LinkedList<String[]>();
         String[] projection = {
                 SPContract.SPEntry.COLUMN_NAME_CLASS,
@@ -260,21 +276,31 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
                         NEWROOM = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_NEWROOM)),
                         TEXT = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_TEXT)),
                         PLANINFO = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_PLANINFO));
-                String[] CLASSSPLIT = CLASS.split(" ");
-                CLASS = CLASSSPLIT[CLASSSPLIT.length-1];
-                String ClassOnly = CLASS.split("-")[0];
-                if(ClassOnly.equals(Class)){
-                    if(COURSE.toUpperCase().replace(" ","").equals(Course.toUpperCase().replace(" ",""))){
-                        String[] retin = new String[6];
-                        retin[0] = KIND;
-                        retin[1] = HOUR;
-                        retin[2] = ROOM;
-                        retin[3] = DATE;
-                        retin[4] = NEWROOM;
-                        retin[5] = TEXT;
-                        ret.add(retin);
+                //Log.e("getSpplaninfo", "Date: |"+DATE+"|"+Date+"|  Hour: |"+HOUR.split(" ")[0]+"|"+Hour);
+                if(DATE.equals(Date)&&HOUR.split(" ")[0].equals(Hour+"")&&Pattern.matches("[^ ]+ [^ -]+-[^ -]+-[^ -]+", CLASS)){
+
+                    String[] CLASSSPLIT = CLASS.split(" ");
+                    CLASS = CLASSSPLIT[CLASSSPLIT.length - 1];
+                    String ClassOnly = CLASS.split("-")[0];
+                    if (ClassOnly.toUpperCase().equals(Class.toUpperCase())) {
+                        //Log.e("getSpplaninfo",CLASS);
+                        //Log.e("getSpplaninfo",COURSE.toUpperCase()+"|"+Course.toUpperCase());
+                        if (COURSE.toUpperCase().replace(" ", "").equals(Course.toUpperCase().replace(" ", ""))) {
+                            //Log.e("getSpplaninfo","EQUAL");
+                            //Log.e("getSpplaninfo",DATE+"|"+HOUR);
+                            String[] retin = new String[6];
+                            retin[0] = KIND;
+                            retin[1] = HOUR;
+                            retin[2] = ROOM;
+                            retin[3] = DATE;
+                            retin[4] = NEWROOM;
+                            retin[5] = TEXT;
+                            ret.add(retin);
+                        }
                     }
                 }
+
+
 
                /*
                     String out = "";
@@ -297,6 +323,7 @@ public class SPDatabaseHelper extends SQLiteOpenHelper {
 
             cursor.close();
         }
+        //Log.e("getSpplaninfo","SIZE:"+ret.size());
         return ret;
     }
 

@@ -35,6 +35,7 @@ public class Timetable {
     String password;
     String username;
     String html;
+    static String varname = "classes";
 
 
     //-------  info  -------
@@ -165,20 +166,27 @@ public class Timetable {
                     //System.out.println("Done");
                 }*/
 
+
                 // get string from list
                 String tmp;
                 if (i < planList.size()) {
                     tmp = planList.get(currentLine);
                 } else break;
 
+                if (row == 2 || row == 4 || row == 6 || row == 8 || row == 10) {
+                    //Log.e("Timetable.update",""+plan[row][0]);
+                    Log.e("TEST", ""+plan[row - 1][i]);
+                    while (i < plan[row].length && plan[row - 1][i] != null && plan[row - 1][i].contains("[SIZE:4]")) {
+                        Log.e("TEST", "VERSCHOBEN"+plan[row - 1][i]);
+                        i++;
+                        //tmp = "Ich wurde verschoben";
+                    }
+                }
+
                 //if line is a Timetable object
                 if (Pattern.matches("[^ ]+ [^ ]+ [^ ]+.+", tmp)) {
-                    if (row == 2 || row == 4 || row == 6 || row == 8 || row == 10) {
-                        while (plan[row - 1][i] != null && plan[row - 1][i].contains("[SIZE:4]")) {
-                            i++;
-                        }
-                    }
-                    plan[row][i] = tmp.replace("[SIZE:4]", "");
+
+                    plan[row][i] = tmp;
                     currentLine++;
 
                     //if line is FREE or PAUSE -> add it and go 2 line further
@@ -192,6 +200,12 @@ public class Timetable {
                     //if the information is not usable it just skips it
                 else currentLine++;
             }
+
+        }
+        for (int x = 1; x < plan.length; x++) {
+            for (int i = 1; i < plan[0].length; i++) {
+                if( plan[x][i] != null) plan[x][i] = plan[x][i].replace("[SIZE:4]", "");
+            }
         }
     }
 
@@ -202,10 +216,10 @@ public class Timetable {
         Document doc = Jsoup.connect(url).header("Authorization", "Basic " + base64login).get(); //loading page.
 
         String htmlraw = doc.html(); // get raw html
-        Matcher m = Pattern.compile("var classes = \\[.+\\];").matcher(htmlraw);
+        Matcher m = Pattern.compile("var "+varname+" = \\[.+\\];").matcher(htmlraw);
         String classes = "";
         if (m.find()) {
-             classes = m.group().replace("var classes = [", "").replace("];","").replace("\"","");
+             classes = m.group().replace("var "+varname+" = [", "").replace("];","").replace("\"","");
         }
 
         String[] classesSplit = classes.split(",");

@@ -281,6 +281,38 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
         return result.split("$$SPLITPOINT$$");
     }
 
+    public String getSavedClass(){
+        String[] projection = {
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK,
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS,
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML
+        };
 
+        String selection = ThtmlContract.ThtmlEntry._ID + " > ?";
+        String[] selectionArgs = {"0"};
 
+        String sortOrder =
+                ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS + " ASC";
+
+        Cursor cursor = this.getReadableDatabase().query(
+                ThtmlContract.ThtmlEntry.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                String[] a = cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML)).split("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">[AB]: ");
+                if(a.length >1){
+                    return a[1].split(" &nbsp;</font> ")[0];
+                }
+
+            } while (cursor.moveToNext());
+        }
+        return "";
+    }
 }

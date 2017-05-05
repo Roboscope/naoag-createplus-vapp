@@ -8,32 +8,37 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="0dp"
+    android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="de.createplus.vertretungsplan.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/overview_textview_teacher"/>
+
     <LinearLayout
+        android:id="@+id/overview_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true">
+        android:paddingTop="50dp">
 
         <TableLayout
             android:id="@+id/overview_tablelayout_outer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF">
+            android:background="?android:colorBackground">
 
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
+                android:background="?android:colorBackground"
                 android:gravity="center">
 
                 <TextView
@@ -41,13 +46,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Heute" />
+                    android:text="" />
             </TableRow>
 
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
+                android:background="?android:colorBackground"
                 android:gravity="center">
 
                 <TextView
@@ -55,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Heute" />
+                    android:text="" />
             </TableRow>
 
 
@@ -69,13 +74,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="1dp"
-                    android:background="#FFFFFF">
+                    android:background="#fff3f3f3">
 
                     <TableLayout
                         android:id="@+id/overview_tablelayout_inner_A"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="#FFFFFF">
+                        android:background="?android:colorBackground">
 
                     </TableLayout>
                 </TableRow>
@@ -86,21 +91,22 @@
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:gravity="center">
+                android:background="?android:colorBackground"
+                android:gravity="center"
+                android:paddingTop="25dp">
 
                 <TextView
                     android:id="@+id/overview_textview_titleB1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Heute" />
+                    android:text="" />
             </TableRow>
 
             <TableRow
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
+                android:background="?android:colorBackground"
                 android:gravity="center">
 
                 <TextView
@@ -108,7 +114,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="Heute" />
+                    android:text="" />
             </TableRow>
 
 
@@ -122,13 +128,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="1dp"
-                    android:background="#FFFFFF">
+                    android:background="?android:colorBackground">
 
                     <TableLayout
                         android:id="@+id/overview_tablelayout_inner_B"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="#FFFFFF">
+                        android:background="?android:colorBackground">
 
                     </TableLayout>
                 </TableRow>
@@ -147,7 +153,7 @@
         ads:adSize="BANNER"
         ads:adUnitId="ca-app-pub-1455056966789635/1379071109"></com.google.android.gms.ads.AdView>
 
-    <Button
+    <!--<Button
         android:layout_alignParentTop="true"
         android:layout_alignLeft="@+id/adBanner"
         android:layout_alignStart="@+id/adBanner"
@@ -156,8 +162,8 @@
         android:background="@android:color/background_light"
         android:fadingEdge="none"
         android:enabled="false"
-        android:layout_width="20dp"
-        android:layout_height="20dp" />
+         />-->
+
 
 
 </RelativeLayout>

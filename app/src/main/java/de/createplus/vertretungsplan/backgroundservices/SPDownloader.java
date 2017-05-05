@@ -11,10 +11,13 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static android.content.ContentValues.TAG;
 
 
 public class SPDownloader {
@@ -37,30 +40,35 @@ public class SPDownloader {
             org.jsoup.select.Elements rows = doc.select("tr");
             List<String> planList = new LinkedList<String>();
             String title = "";
-
+            Calendar cal = Calendar.getInstance();
             for (org.jsoup.nodes.Element row : rows) {
 
                 int i = 0;
-                String[] data = new String[7];
+                String[] data = new String[8];
                 org.jsoup.select.Elements columns = row.select("td");
                 for (org.jsoup.nodes.Element column : columns) {
-                    //if (Pattern.matches("[^ ]+ [^ -]+-[^ -]+-[^ -]+", column.text()) || Pattern.matches(" [^ ]+", column.text())) {
-                    //    title = column.text();
-                    //} else {
-                        data[i] = column.text();
-                        i++;
-                    //}
+                    //Log.e(TAG,column.html());
+                    if (column.outerHtml().contains("class=\"list inline_header\"")) {
+                        title = column.text();
+                    } else {
+                        //if(i < 7){
+                            data[i] = column.text();
+                            i++;
+                        //}
+                    }
                 }
                 if (data[6] != null) {
-                    //Log.e("VERTRETUNGSPLAN", title);
+
+                    data[0] = info.split("\\.")[0].replace(" ","") + "." + info.split("\\.")[1].replace(" ","") + ".";
+                    //Log.e("VERTRETUNGSPLAN", title + Arrays.toString(data) + "INFO:" + info);
                     SPDbHelper.addLine(title, data, info);
-                }else if(data[1] == null){
+                }/*else if(data[1] == null){
                     title = data[0];
-                }
+                }*/
 
             }
         } catch (IOException e) {
-            Log.e("DOWNLOAD ERROR: ", "E: "+e.toString());
+            Log.e("VERTRETUNGSPLAN", e.toString());
             return -1;
         }return getMaxPlans(info);
 

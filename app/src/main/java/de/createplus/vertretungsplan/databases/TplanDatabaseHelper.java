@@ -167,7 +167,7 @@ public class TplanDatabaseHelper extends SQLiteOpenHelper {
                 tmp[6] = cursor.getString(cursor.getColumnIndexOrThrow(TplanContract.TplanEntry.COLUMN_NAME_ROOM));
                 if(dbgroups.getCourseState(tmp[4])){
                     ret.add(tmp);
-                    Log.e("getPlan", Arrays.toString(tmp));
+                    //Log.e("getPlan", Arrays.toString(tmp));
                 }
             } while (cursor.moveToNext());
             cursor.close();

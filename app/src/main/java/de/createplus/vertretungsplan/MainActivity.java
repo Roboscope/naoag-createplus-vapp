@@ -4,15 +4,19 @@ import android.Manifest;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
@@ -53,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 
 import de.createplus.vertretungsplan.backgroundservices.Pair;
@@ -78,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     InterstitialAd mInterstitialAd;
-    static private ContentViews currentContent = ContentViews.OVERVIEW;
+    static private ContentViews currentContent = null;
     private AdView mAdView;
     static public Pair TimetableIndex = null;
     static private int CurrentShown = 1;
@@ -98,6 +103,22 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         THIS = this;
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String defsite = sharedPref.getString(SettingsActivity.KEY_COURSE_DEFAULTSITE, "1");
+        if (currentContent == null) {
+            switch (defsite) {
+                case "1":
+                    currentContent = ContentViews.OVERVIEW;
+                    break;
+                case "2":
+                    currentContent = ContentViews.SUBSTITUTIONPLAN;
+                    break;
+                case "3":
+                    currentContent = ContentViews.TIMETABLE;
+                    break;
+            }
+        }
+
         updateDate();
 
         //Update Timetable if needed.
@@ -117,7 +138,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onClick(View view) {
-                if(!updating){
+                if (!updating) {
                     updating = true;
                     Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
                     MainActivity.this.startService(mServiceIntent);
@@ -311,7 +332,18 @@ public class MainActivity extends AppCompatActivity
         if (currentContent == ContentViews.OVERVIEW) {
             setTitle("Übersicht");
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
-            setupOverview();
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean teacherMode = sharedPref.getBoolean(SettingsActivity.KEY_TEACHERMODE, false);
+            if (teacherMode) {
+                TextView TitleToday1 = (TextView) findViewById(R.id.overview_textview_teacher);
+                TitleToday1.setText("Die Übersicht ist im Lehrer Modus nicht vorhanden.");
+                LinearLayout layout = (LinearLayout) findViewById(R.id.overview_layout);
+                layout.setVisibility(View.INVISIBLE);
+            } else {
+                TextView TitleToday1 = (TextView) findViewById(R.id.overview_textview_teacher);
+                TitleToday1.setVisibility(View.INVISIBLE);
+                setupOverview();
+            }
             //WebView web = (WebView) findViewById(R.id.overview_webview);
             //web.loadData("<html>    <link href=\"https://fonts.googleapis.com/css?family=Source+Sans+Pro\" rel=\"stylesheet\">    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">    <style>        .coupon {            width: 250px;            padding: 10px;            text-align: center;            border: 3px dashed #0099ff; }        .t {            font-family: 'Source Sans Pro', sans-serif; }        .z {            font-family: 'Open Sans', sans-serif; }    </style>    <table cellspacing=\"10\" class=\"t\"><tr class=\"z\"><th>Heute: Montag,<br>06.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr><tr class=\"z\"><th><br>Morgen: Dienstag,<br>07.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr></table> </html>\n", "text/html", null);
             //ADS
@@ -324,13 +356,13 @@ public class MainActivity extends AppCompatActivity
             ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
             SPDatabaseHelper db = new SPDatabaseHelper(this);
             if (CurrentShown == 1) {
-                ArrayList<Parent> Plan = db.getPlan(TodayDate);
+                ArrayList<Parent> Plan = db.getPlan(TodayDate, this);
                 if (Plan.size() < 1)
                     findViewById(R.id.subplan_textfield).setVisibility(View.VISIBLE);
                 mExpandableList.setAdapter(new MyCustomAdapter(this, Plan));
                 mExpandableList.setVisibility(View.VISIBLE);
             } else {
-                ArrayList<Parent> Plan = db.getPlan(TomorrowDate);
+                ArrayList<Parent> Plan = db.getPlan(TomorrowDate, this);
                 if (Plan.size() < 1)
                     findViewById(R.id.subplan_textfield).setVisibility(View.VISIBLE);
                 mExpandableList.setAdapter(new MyCustomAdapter(this, Plan));
@@ -351,7 +383,7 @@ public class MainActivity extends AppCompatActivity
                         SW.setText(TomorrowDateString);
                         ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
 
-                        ArrayList<Parent> Plan = db.getPlan(TomorrowDate);
+                        ArrayList<Parent> Plan = db.getPlan(TomorrowDate, MainActivity.this);
                         mExpandableList.setVisibility(View.INVISIBLE);
                         if (Plan.size() < 1)
                             findViewById(R.id.subplan_textfield).setVisibility(View.VISIBLE);
@@ -368,7 +400,7 @@ public class MainActivity extends AppCompatActivity
                         CurrentShown = 1;
                         ExpandableListView mExpandableList = (ExpandableListView) findViewById(R.id.expandable_list);
 
-                        ArrayList<Parent> Plan = db.getPlan(TodayDate);
+                        ArrayList<Parent> Plan = db.getPlan(TodayDate, MainActivity.this);
                         mExpandableList.setVisibility(View.INVISIBLE);
                         if (Plan.size() < 1)
                             findViewById(R.id.subplan_textfield).setVisibility(View.VISIBLE);
@@ -400,7 +432,6 @@ public class MainActivity extends AppCompatActivity
             TABLE.getSettings().setBuiltInZoomControls(true);
             TABLE.getSettings().setDisplayZoomControls(false);
             TABLE.setLongClickable(false);
-
 
             //ADS
             loadBanner(0);
@@ -480,12 +511,36 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-        System.out.println(Arrays.toString(TodayEntries));
+        //System.out.println(Arrays.toString(TodayEntries));
 
         for (int i = 1; i < TodayEntries.length - 1; i++) {
             if (TodayEntries[i] != null) {
                 TableRow tr = new TableRow(MainActivity.this);
                 String[] tmp = TodayEntries[i].split(" ");
+                SPDatabaseHelper db = new SPDatabaseHelper(MainActivity.this);
+                ThtmlDatabaseHelper dbFORCLASS = new ThtmlDatabaseHelper(this);
+                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(),tmp[0],TodayDate,i);
+                String[] sp =null;
+                int changetypeNotFinal = 0; // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+                if(spplan.size()>0){
+                    sp= spplan.get(0);
+                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
+                    Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
+                    String Kind = sp[0].replace(" ","").toUpperCase();
+                    String Text = sp[5].replace(" ","").toUpperCase();
+                    if(Kind.equals("RAUM-VTR.")){
+                        changetypeNotFinal = 2;
+                    }else if(Kind.equals("VERTRETUNG") && Text.equals("SELBSTSTÄNDIGESARBEITEN")){
+                        changetypeNotFinal = 3;
+                    }else if(Kind.equals("VERTRETUNG")){
+                        changetypeNotFinal = 1;
+                    }else{
+                        changetypeNotFinal = 4;
+                    }
+                    Log.e("setupOverview",""+changetypeNotFinal);
+                }
+                final int changetype = changetypeNotFinal;
+
                 if (TodayEntries[i + 1] != null) {
                     TextView two = new TextView(MainActivity.this);
                     two.setPadding(20, 20, 20, 20);
@@ -493,26 +548,57 @@ public class MainActivity extends AppCompatActivity
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
-                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
+                        if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        tw.setText(tmp[o].replace(" ",""));
+                        tw.setText(tmp[o].replace(" ", ""));
                         tw.setTextSize(textsize);
+                        tw.setTextColor(getChangeColor(changetype));
                         tr.addView(tw);
                     }
                 } else {
+
+
                     TextView two = new TextView(MainActivity.this);
                     two.setPadding(20, 20, 20, 20);
                     two.setText(i + "/" + (i + 1));
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
-                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
+                        if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        tw.setText(tmp[o].replace(" ",""));
+
                         tw.setTextSize(textsize);
+                        if(changetype == 2){
+                            if(o == 2){
+                                tw.setTextColor(getChangeColor(changetype));
+                                tmp[2] = sp[4];
+                                //Log.e("setupOverview",Arrays.toString(sp));
+                            }
+                        }else{
+                            tw.setTextColor(getChangeColor(changetype));
+                        }
+                        tw.setText(tmp[o].replace(" ", ""));
                         tr.addView(tw);
+                    }
+
+                    if(changetype != 0){
+                        LinearLayout outerLayout = new LinearLayout(this);
+                        ImageView picture = new ImageView(this);
+                        outerLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onClickOverview(spplan.get(0),changetype);
+                            }
+                        });
+                        LinearLayout.LayoutParams pictureLayoutParams = new LinearLayout.LayoutParams(60, 60);
+                        picture.setImageResource(R.drawable.info_button);
+                        pictureLayoutParams.setMargins(0, 28, 10, 0);
+                        //picture.setPadding(0, 35, 10, 0);
+
+                        outerLayout.addView(picture, pictureLayoutParams);
+                        tr.addView(outerLayout);
                     }
                     i++;
                 }
@@ -543,12 +629,36 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-        System.out.println(Arrays.toString(TomorrowEntries));
-
+        //System.out.println(Arrays.toString(TomorrowEntries));
+        Log.e("setupOverview","-------------------------------------");
         for (int i = 1; i < TomorrowEntries.length - 1; i++) {
+
             if (TomorrowEntries[i] != null) {
                 TableRow tr = new TableRow(MainActivity.this);
                 String[] tmp = TomorrowEntries[i].split(" ");
+                SPDatabaseHelper db = new SPDatabaseHelper(MainActivity.this);
+                ThtmlDatabaseHelper dbFORCLASS = new ThtmlDatabaseHelper(this);
+                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(),tmp[0],TomorrowDate,i);
+                String[] sp = null;
+                int changetypeNotFinal = 0; // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+                if(spplan.size()>0){
+                    sp = spplan.get(0);
+                    //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
+                    Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
+                    String Kind = sp[0].replace(" ","").toUpperCase();
+                    String Text = sp[5].replace(" ","").toUpperCase();
+                    if(Kind.equals("RAUM-VTR.")){
+                        changetypeNotFinal = 2;
+                    }else if(Kind.equals("VERTRETUNG") && Text.equals("SELBSTSTÄNDIGESARBEITEN")){
+                        changetypeNotFinal = 3;
+                    }else if(Kind.equals("VERTRETUNG")){
+                        changetypeNotFinal = 1;
+                    }else{
+                        changetypeNotFinal = 4;
+                    }
+                    Log.e("setupOverview",""+changetypeNotFinal);
+                }
+                final int changetype = changetypeNotFinal;
                 if (TomorrowEntries[i + 1] != null) {
                     TextView two = new TextView(MainActivity.this);
                     two.setPadding(20, 20, 20, 20);
@@ -556,11 +666,11 @@ public class MainActivity extends AppCompatActivity
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
-                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
-                        Log.e("O","|"+tmp[o]+"|");
+                        if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
+                        //Log.e("O", "|" + tmp[o] + "|");
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        tw.setText(tmp[o].replace(" ",""));
+                        tw.setText(tmp[o].replace(" ", ""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
                     }
@@ -571,14 +681,41 @@ public class MainActivity extends AppCompatActivity
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
-                        if(tmp[o].equals(" ") || tmp[o].equals(""))o++;
+                        if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setPadding(20, 20, 20, 20);
-                        Log.e("O","|"+tmp[o]+"|");
-                        tw.setText(tmp[o].replace(" ",""));
+                        //Log.e("O", "|" + tmp[o] + "|");
+                        if(changetype == 2){
+                            if(o == 2){
+                                tw.setTextColor(getChangeColor(changetype));
+                                tmp[2] = sp[4];
+                                Log.e("setupOverview",Arrays.toString(sp));
+                            }
+                        }else{
+                            tw.setTextColor(getChangeColor(changetype));
+                        }
+                        tw.setText(tmp[o].replace(" ", ""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
                     }
+                    if(changetype != 0){
+                        LinearLayout outerLayout = new LinearLayout(this);
+                        ImageView picture = new ImageView(this);
+                        outerLayout.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onClickOverview(spplan.get(0),changetype);
+                            }
+                        });
+                        LinearLayout.LayoutParams pictureLayoutParams = new LinearLayout.LayoutParams(60, 60);
+                        picture.setImageResource(R.drawable.info_button);
+                        pictureLayoutParams.setMargins(0, 28, 10, 0);
+                        //picture.setPadding(0, 35, 10, 0);
+
+                        outerLayout.addView(picture, pictureLayoutParams);
+                        tr.addView(outerLayout);
+                    }
+
                     i++;
                 }
 
@@ -589,24 +726,58 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadBanner(int i) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean adPref = sharedPref.getBoolean(SettingsActivity.KEY_AD_BANNER, true);
-        if (adPref) {
-            mAdView = (AdView) findViewById(R.id.adBanner);
-            AdRequest adRequest = new AdRequest.Builder().addTestDevice("2C75B378313C32C7D50757BB562FF544").build();
-            mAdView.loadAd(adRequest);
-            if (i == 1) {
-                RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
-                        ViewGroup.LayoutParams.FILL_PARENT);
 
-                p.addRule(RelativeLayout.BELOW, R.id.adBanner);
-                TextView tw = (TextView) findViewById(R.id.subplan_textfield);
-                tw.setLayoutParams(p);
+        mAdView = (AdView) findViewById(R.id.adBanner);
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2C75B378313C32C7D50757BB562FF544").build();
+        mAdView.loadAd(adRequest);
+        /*if (i == 1) {
+            RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
+                    ViewGroup.LayoutParams.FILL_PARENT);
 
-                ExpandableListView exp = (ExpandableListView) findViewById(R.id.expandable_list);
-                exp.setLayoutParams(p);
-            }
+            p.addRule(RelativeLayout.BELOW, R.id.adBanner);
+            TextView tw = (TextView) findViewById(R.id.subplan_textfield);
+            tw.setLayoutParams(p);
+
+            ExpandableListView exp = (ExpandableListView) findViewById(R.id.expandable_list);
+            exp.setLayoutParams(p);
+        }*/
+    }
+
+    private void onClickOverview(String[] sp, int change){ //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;change 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+        String Title = "";
+        String Text = "";
+
+
+        switch (change){
+            case 1: Title = "Vertretung:";Text = "In Raum: " + sp[4]; break;
+            case 2: Title = "Raumwechsel:";Text = "Alter Raum: " + sp[2] + "\nNeuer Raum: "+sp[4]; break;
+            case 3: Title = "Entfall:"; break;
+            case 4: Title = sp[0];Text = "Alter Raum: " + sp[2] + "\nNeuer Raum: "+sp[4];break;
         }
+        //Log.e("setupOverview", "|"+sp[5].replace(" ","")+"|");
+        if(sp[5].replace(" ","").length() > 2){
+            Text = Text + "\nInfos: "+sp[5];
+        }
+        dlgAlert.setMessage(Text);
+        dlgAlert.setTitle(Title);
+        dlgAlert.setPositiveButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+        dlgAlert.setCancelable(true);
+        dlgAlert.create().show();
+    }
 
+    private int getChangeColor(int type){// 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+        switch (type){
+            case 0: return Color.DKGRAY;
+            case 1: return Color.CYAN;
+            case 2: return Color.BLUE;
+            case 3: return Color.GREEN;
+            case 4: return Color.DKGRAY;
+        }
+        return Color.DKGRAY;
     }
 }

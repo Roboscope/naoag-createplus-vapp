@@ -97,7 +97,7 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
                 String[] tmp = new String[2];
                 tmp[0] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE));
                 tmp[1] = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
-                Log.e("getAll", Arrays.toString(tmp));
+                //Log.e("getAll", Arrays.toString(tmp));
                 ret.add(tmp);
             } while (cursor.moveToNext());
             cursor.close();
@@ -131,7 +131,7 @@ public class TgroupsDatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
             do {
                 String tmp = cursor.getString(cursor.getColumnIndexOrThrow(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED));
-                Log.e("getCourseState",tmp);
+                //Log.e("getCourseState",tmp);
                 if (Integer.parseInt(tmp) == 1) {
                     return true;
                 }

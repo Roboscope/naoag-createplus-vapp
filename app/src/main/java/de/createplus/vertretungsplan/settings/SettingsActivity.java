@@ -55,6 +55,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     public static final String KEY_TEACHER_USERNAME = "pref_key_teacherlogin_username";
     public static final String KEY_AD_BANNER = "pref_key_ad_status";
     public static final String KEY_COURSE_SELECTION = "pref_key_list_timetableselection";
+    public static final String KEY_COURSE_DEFAULTSITE = "pref_key_list_defaultview";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
