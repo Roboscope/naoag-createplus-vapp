@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -31,6 +32,7 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -102,9 +104,17 @@ public class MainActivity extends AppCompatActivity
     static public String[] days = {"Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"};
     static public MainActivity THIS;
     static public boolean updating = false;
+    static public int width = 0;
+    static public int height = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        width = size.x;
+        height = size.y;
+        Log.e("Main Screen Hight",""+height);
         super.onCreate(savedInstanceState);
 
         if(android.os.Build.VERSION.SDK_INT >= 21){
@@ -179,6 +189,9 @@ public class MainActivity extends AppCompatActivity
 
         updateContainerContent();
         setupInterstitial();
+
+
+
     }
 
     private void setupBackgoundtasks() {
@@ -297,6 +310,23 @@ public class MainActivity extends AppCompatActivity
             Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
             MainActivity.this.startActivity(myIntent);
             return true;
+        }else if (id == R.id.action_credits) {
+            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+            String version = "4.0.4";
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                version = pInfo.versionName;
+            }catch (Exception e ){
+
+            }
+            String text = "<br /><b>Vertretungsplanapp</b><br />Version: "+version+"<br /><br />Entwickelt von:<br /><b>Max Nuglisch</b><br /><br />Design & Logo:<br /><b>Jonas Leuchtenberger</b><br /><br />Veröffentlicht von:<br /><b>CreatePlus GmbH.</b><br /><br />Website:<br /><b>createplus.de</b><br />";
+            TextView myMsg = new TextView(this);
+            myMsg.setTextSize(20);
+            myMsg.setText(Html.fromHtml(text));
+            myMsg.setGravity(Gravity.CENTER_HORIZONTAL);
+            builder.setView(myMsg);
+            builder.create().show();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -338,16 +368,7 @@ public class MainActivity extends AppCompatActivity
             }catch (Exception e ){
 
             }
-
-
             String text = "<br /><b>Vertretungsplanapp</b><br />Version: "+version+"<br /><br />Entwickelt von:<br /><b>Max Nuglisch</b><br /><br />Design & Logo:<br /><b>Jonas Leuchtenberger</b><br /><br />Veröffentlicht von:<br /><b>CreatePlus GmbH.</b><br /><br />Website:<br /><b>createplus.de</b><br />";
-            /*builder.setTitle("Credits:")
-                    .setMessage(Html.fromHtml(text))
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-
-                        }
-                    });*/
             TextView myMsg = new TextView(this);
             myMsg.setTextSize(20);
             myMsg.setText(Html.fromHtml(text));
@@ -360,7 +381,6 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
     public void updateContainerContent() {
         //Log.e("UPDATE CONTENT", "Updating to: " + currentContent);
@@ -523,8 +543,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupOverview() {
-        int tiltesize = 23;
-        int textsize = 18;
+        int tiltesize = height / 83;
+        int textsize = height / 106;
+        Log.e("setupOverview",tiltesize+"");
+        Log.e("setupOverview",textsize+"");
         TableLayout LayoutToday = (TableLayout) findViewById(R.id.overview_tablelayout_inner_A);
         TableLayout LayoutTomorrow = (TableLayout) findViewById(R.id.overview_tablelayout_inner_B);
         TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
