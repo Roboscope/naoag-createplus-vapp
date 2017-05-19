@@ -137,7 +137,7 @@ public class UpdateTimetable extends IntentService {
             try{
                 Timetable Plan = new Timetable(weeks[0],"t",Integer.parseInt(classPref),teacherUSERNAMEPref,teacherPASSWORDPref);
                 Plan.update();
-                Plan.print();
+                //Plan.print();
                 /*TplanDatabaseHelper dbplan = new TplanDatabaseHelper(getApplicationContext());
                 dbplan.removeAll();
                 dbplan.close();*/
@@ -164,7 +164,7 @@ public class UpdateTimetable extends IntentService {
             try{
                 Timetable Plan = new Timetable(weeks[1],"t",Integer.parseInt(classPref),teacherUSERNAMEPref,teacherPASSWORDPref);
                 Plan.update();
-                Plan.print();
+                //Plan.print();
 
                 //Plan.addToSQL(this);
 
@@ -221,6 +221,9 @@ public class UpdateTimetable extends IntentService {
             //db.addLine("0","0","<html> Offline Modus: Der Plan könnte veraltet sein! <html>");
             return;
         }
+        if(MainActivity.TimetableIndex.a != null){
+            return;
+        }
 
         int[] weeks = new int[2];
 
@@ -267,7 +270,7 @@ public class UpdateTimetable extends IntentService {
 
         if(testifequal == 4){
             Log.e("Update Timetable: ","Not updating.");
-            //return;
+            return;
         }Log.e("Update Timetable: ","Updating.");
 
         String msg = "Stundenplanplan erfolgreich neu geladen!";

@@ -29,13 +29,13 @@ import de.createplus.vertretungsplan.databases.TplanDatabaseHelper;
  */
 
 public class Timetable {
-    static String urlArchive = "http://gymnasium-wuerselen.de/untis/Schueler-Stundenplan/";
+    public static String urlArchive = "http://gymnasium-wuerselen.de/untis/Schueler-Stundenplan/";
     String schoolname = "Gymnasium der Stadt Würselen";
     String url;
     String password;
     String username;
     String html;
-    static String varname = "classes";
+    public static String varname = "classes";
 
 
     //-------  info  -------
@@ -173,11 +173,11 @@ public class Timetable {
                     tmp = planList.get(currentLine);
                 } else break;
 
-                if (row == 2 || row == 4 || row == 6 || row == 8 || row == 10) {
+                if (row == 2 || row == 4 || row == 6 || row == 9 || row == 11) {
                     //Log.e("Timetable.update",""+plan[row][0]);
-                    Log.e("TEST", ""+plan[row - 1][i]);
+                    //Log.e("TEST", ""+plan[row - 1][i]);
                     while (i < plan[row].length && plan[row - 1][i] != null && plan[row - 1][i].contains("[SIZE:4]")) {
-                        Log.e("TEST", "VERSCHOBEN"+plan[row - 1][i]);
+                        //Log.e("TEST", "VERSCHOBEN"+plan[row - 1][i]);
                         i++;
                         //tmp = "Ich wurde verschoben";
                     }

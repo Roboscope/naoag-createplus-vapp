@@ -12,6 +12,7 @@
             android:theme="@style/AppTheme">
         <activity
                 android:name=".MainActivity"
+                android:screenOrientation="portrait"
                 android:label="@string/app_name"
                 android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -24,7 +25,15 @@
         <activity
             android:name=".settings.SettingsActivity"
             android:label="Einstellungen"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity
+            android:name=".tempteachermode.TempTeacherModeActivity"
+            android:label="TempTeacherMode"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
 
         </activity>
 
@@ -33,6 +42,9 @@
                 android:exported="false"/>
         <service
             android:name=".backgroundservices.UpdateTimetable"
+            android:exported="false"/>
+        <service
+            android:name=".backgroundservices.UpdateTempTeacherPlan"
             android:exported="false"/>
 
 

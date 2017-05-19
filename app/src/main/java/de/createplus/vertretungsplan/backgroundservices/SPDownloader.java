@@ -51,10 +51,8 @@ public class SPDownloader {
                     if (column.outerHtml().contains("class=\"list inline_header\"")) {
                         title = column.text();
                     } else {
-                        //if(i < 7){
                             data[i] = column.text();
                             i++;
-                        //}
                     }
                 }
                 if (data[6] != null) {
@@ -62,10 +60,7 @@ public class SPDownloader {
                     data[0] = info.split("\\.")[0].replace(" ","") + "." + info.split("\\.")[1].replace(" ","") + ".";
                     //Log.e("VERTRETUNGSPLAN", title + Arrays.toString(data) + "INFO:" + info);
                     SPDbHelper.addLine(title, data, info);
-                }/*else if(data[1] == null){
-                    title = data[0];
-                }*/
-
+                }
             }
         } catch (IOException e) {
             Log.e("VERTRETUNGSPLAN", e.toString());

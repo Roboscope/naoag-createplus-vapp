@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.MultiSelectListPreference;
 import android.preference.Preference;
@@ -41,6 +42,7 @@ import de.createplus.vertretungsplan.backgroundservices.UpdateTimetable;
 import de.createplus.vertretungsplan.databases.TgroupsContract;
 import de.createplus.vertretungsplan.databases.TgroupsDatabaseHelper;
 import de.createplus.vertretungsplan.databases.ThtmlDatabaseHelper;
+import de.createplus.vertretungsplan.tempteachermode.TempTeacherModeActivity;
 
 /**
  * Created by Max Nuglisch on 16.02.2017.
@@ -56,6 +58,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     public static final String KEY_AD_BANNER = "pref_key_ad_status";
     public static final String KEY_COURSE_SELECTION = "pref_key_list_timetableselection";
     public static final String KEY_COURSE_DEFAULTSITE = "pref_key_list_defaultview";
+    public static final String KEY_CHEATCODES = "pref_key_cheatcodes";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,10 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             final MultiSelectListPreference listPreference = (MultiSelectListPreference) findPreference(KEY_COURSE_SELECTION);
             setListPreferenceDataCOURSE(listPreference,coursesall);
         }
+        EditTextPreference editTextPreference = (EditTextPreference) findPreference(KEY_CHEATCODES);
+        editTextPreference.setText("");
+
+
 
         /*TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
         LinkedList<String[]> coursesall = dbgroups.getAllGroups();
@@ -114,13 +121,10 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             String[] tmp = new String[courseSET.size()];
             int o = 0;
             for (String i : courseSET){
-                //Log.e("GROUP SET TO TRUE",i);
                 tmp[o] = i;
                 o++;
             }
-        /*for(int i = 0; i < tmp.length; i++){
-            tmp[i] = tmp[i].split("SPLITPOINT")[1];
-        }*/
+
             val = new ContentValues();
             val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED,"1");
             for(int i = 0; i < tmp.length;i++){
@@ -128,6 +132,15 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
             }
             MainActivity.THIS.updateContainerContent();
         }
+
+        String cheatcode = sharedPref.getString(SettingsActivity.KEY_CHEATCODES,"");
+        if(cheatcode.contains("gtp")){
+            TempTeacherModeActivity.teacher = cheatcode.replace("gtp","").replace(" ","");
+            Intent myIntent = new Intent(this, TempTeacherModeActivity.class);
+            this.startActivity(myIntent);
+        }
+        EditTextPreference editTextPreference = (EditTextPreference) findPreference(KEY_CHEATCODES);
+        editTextPreference.setText("");
     }
 
     protected static void setListPreferenceDataCLASS(ListPreference lp) {

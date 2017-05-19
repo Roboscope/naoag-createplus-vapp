@@ -78,6 +78,12 @@
             android:key="pref_key_list_defaultview"
             android:title="Startseite"
             android:summary="Die Seite die beim Starten der App geöffnet ist."/>
+        <EditTextPreference
+            android:defaultValue="1"
+            android:key="pref_key_cheatcodes"
+            android:title="Cheatcode"
+            android:summary="Gib hier einen Cheatcode ein und lass dich überraschen."/>
     </PreferenceCategory>
+
 
 </PreferenceScreen>

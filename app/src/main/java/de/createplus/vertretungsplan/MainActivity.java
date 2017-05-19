@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -26,6 +27,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -40,6 +42,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.*;
 
@@ -102,6 +106,23 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(android.os.Build.VERSION.SDK_INT >= 21){
+            Window window = this.getWindow();
+            // clear FLAG_TRANSLUCENT_STATUS flag:
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            // finally change the color
+            window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
+        }
+
+
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        //window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+        // finally change the color
+        //window.setStatusBarColor(ContextCompat.getColor(activity,R.color.my_statusbar_color));
         THIS = this;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String defsite = sharedPref.getString(SettingsActivity.KEY_COURSE_DEFAULTSITE, "1");
@@ -247,7 +268,6 @@ public class MainActivity extends AppCompatActivity
         TomorrowWeek = forWeek.get(Calendar.WEEK_OF_YEAR);
     }
 
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -265,7 +285,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -275,6 +294,8 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
+            MainActivity.this.startActivity(myIntent);
             return true;
         }
 
@@ -306,9 +327,33 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
             Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
             MainActivity.this.startActivity(myIntent);
-
         } else if (id == R.id.nav_send) {
 
+        } else if (id == R.id.nav_Credits) {
+            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+            String version = "4.0.4";
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                version = pInfo.versionName;
+            }catch (Exception e ){
+
+            }
+
+
+            String text = "<br /><b>Vertretungsplanapp</b><br />Version: "+version+"<br /><br />Entwickelt von:<br /><b>Max Nuglisch</b><br /><br />Design & Logo:<br /><b>Jonas Leuchtenberger</b><br /><br />Veröffentlicht von:<br /><b>CreatePlus GmbH.</b><br /><br />Website:<br /><b>createplus.de</b><br />";
+            /*builder.setTitle("Credits:")
+                    .setMessage(Html.fromHtml(text))
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+
+                        }
+                    });*/
+            TextView myMsg = new TextView(this);
+            myMsg.setTextSize(20);
+            myMsg.setText(Html.fromHtml(text));
+            myMsg.setGravity(Gravity.CENTER_HORIZONTAL);
+            builder.setView(myMsg);
+            builder.create().show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -427,7 +472,7 @@ public class MainActivity extends AppCompatActivity
             WebView TABLE = (WebView) findViewById(R.id.timetable_table);
             ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
             String tmp = db.getHtml();
-            TABLE.loadData(tmp, "text/html", "UTF-8");
+            //TABLE.loadData(tmp, "text/html", "UTF-8");
             TABLE.loadDataWithBaseURL("fake://fake.de", tmp, "text/html", "UTF-8", null);
             TABLE.getSettings().setBuiltInZoomControls(true);
             TABLE.getSettings().setDisplayZoomControls(false);
@@ -511,9 +556,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-        //System.out.println(Arrays.toString(TodayEntries));
+        System.out.println(Arrays.toString(TodayEntries));
 
-        for (int i = 1; i < TodayEntries.length - 1; i++) {
+        for (int i = 1; i < TodayEntries.length; i++) {
             if (TodayEntries[i] != null) {
                 TableRow tr = new TableRow(MainActivity.this);
                 String[] tmp = TodayEntries[i].split(" ");
@@ -525,23 +570,23 @@ public class MainActivity extends AppCompatActivity
                 if(spplan.size()>0){
                     sp= spplan.get(0);
                      //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
-                    Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
+                    //Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
                     String Kind = sp[0].replace(" ","").toUpperCase();
                     String Text = sp[5].replace(" ","").toUpperCase();
                     if(Kind.equals("RAUM-VTR.")){
                         changetypeNotFinal = 2;
-                    }else if(Kind.equals("VERTRETUNG") && Text.equals("SELBSTSTÄNDIGESARBEITEN")){
+                    }else if(  (Kind.equals("VERTRETUNG") && (Text.equals("SELBSTSTÄNDIGESARBEITEN")||Text.equals("SELBSTST.ARBEITEN")))  || Kind.equals("ENTFALL")){
                         changetypeNotFinal = 3;
                     }else if(Kind.equals("VERTRETUNG")){
                         changetypeNotFinal = 1;
                     }else{
                         changetypeNotFinal = 4;
                     }
-                    Log.e("setupOverview",""+changetypeNotFinal);
+                    //Log.e("setupOverview",""+changetypeNotFinal);
                 }
                 final int changetype = changetypeNotFinal;
 
-                if (TodayEntries[i + 1] != null) {
+                if ((i + 1) <TodayEntries.length && TodayEntries[i + 1] != null) {
                     TextView two = new TextView(MainActivity.this);
                     two.setPadding(20, 20, 20, 20);
                     two.setText(i + "");
@@ -567,6 +612,7 @@ public class MainActivity extends AppCompatActivity
                     for (int o = 0; o < tmp.length; o++) {
                         if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
+                        tw.setTextColor(Color.BLACK);
                         tw.setPadding(20, 20, 20, 20);
 
                         tw.setTextSize(textsize);
@@ -629,9 +675,9 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-        //System.out.println(Arrays.toString(TomorrowEntries));
-        Log.e("setupOverview","-------------------------------------");
-        for (int i = 1; i < TomorrowEntries.length - 1; i++) {
+        System.out.println(Arrays.toString(TomorrowEntries));
+        //Log.e("setupOverview","-------------------------------------");
+        for (int i = 1; i < TomorrowEntries.length; i++) {
 
             if (TomorrowEntries[i] != null) {
                 TableRow tr = new TableRow(MainActivity.this);
@@ -644,22 +690,22 @@ public class MainActivity extends AppCompatActivity
                 if(spplan.size()>0){
                     sp = spplan.get(0);
                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
-                    Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
+                    //Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
                     String Kind = sp[0].replace(" ","").toUpperCase();
                     String Text = sp[5].replace(" ","").toUpperCase();
                     if(Kind.equals("RAUM-VTR.")){
                         changetypeNotFinal = 2;
-                    }else if(Kind.equals("VERTRETUNG") && Text.equals("SELBSTSTÄNDIGESARBEITEN")){
+                    }else if(  (Kind.equals("VERTRETUNG") && (Text.equals("SELBSTSTÄNDIGESARBEITEN")||Text.equals("SELBSTST.ARBEITEN")))  || Kind.equals("ENTFALL")){
                         changetypeNotFinal = 3;
                     }else if(Kind.equals("VERTRETUNG")){
                         changetypeNotFinal = 1;
                     }else{
                         changetypeNotFinal = 4;
                     }
-                    Log.e("setupOverview",""+changetypeNotFinal);
+                   // Log.e("setupOverview",""+changetypeNotFinal);
                 }
                 final int changetype = changetypeNotFinal;
-                if (TomorrowEntries[i + 1] != null) {
+                if ((i + 1) <TomorrowEntries.length && TomorrowEntries[i + 1] != null) {
                     TextView two = new TextView(MainActivity.this);
                     two.setPadding(20, 20, 20, 20);
                     two.setText(i + "");
@@ -683,13 +729,14 @@ public class MainActivity extends AppCompatActivity
                     for (int o = 0; o < tmp.length; o++) {
                         if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
+                        tw.setTextColor(Color.BLACK);
                         tw.setPadding(20, 20, 20, 20);
                         //Log.e("O", "|" + tmp[o] + "|");
                         if(changetype == 2){
                             if(o == 2){
                                 tw.setTextColor(getChangeColor(changetype));
                                 tmp[2] = sp[4];
-                                Log.e("setupOverview",Arrays.toString(sp));
+                                //Log.e("setupOverview",Arrays.toString(sp));
                             }
                         }else{
                             tw.setTextColor(getChangeColor(changetype));
@@ -750,16 +797,19 @@ public class MainActivity extends AppCompatActivity
 
 
         switch (change){
-            case 1: Title = "Vertretung:";Text = "In Raum: " + sp[4]; break;
-            case 2: Title = "Raumwechsel:";Text = "Alter Raum: " + sp[2] + "\nNeuer Raum: "+sp[4]; break;
+            case 1: Title = "Vertretung:";Text = "<b>In Raum:</b> " + sp[4]; break;
+            case 2: Title = "Raumwechsel:";Text = "<b>Alter Raum:</b> " + sp[2] + "<br/><b>Neuer Raum:</b> "+sp[4]; break;
             case 3: Title = "Entfall:"; break;
-            case 4: Title = sp[0];Text = "Alter Raum: " + sp[2] + "\nNeuer Raum: "+sp[4];break;
+            case 4: Title = sp[0];Text = "<b>Alter Raum:</b> " + sp[2] + "<br/><b>Neuer Raum:</b> "+sp[4];break;
         }
         //Log.e("setupOverview", "|"+sp[5].replace(" ","")+"|");
         if(sp[5].replace(" ","").length() > 2){
-            Text = Text + "\nInfos: "+sp[5];
+            Text = Text + "<br/><b>Infos:</b> "+sp[5];
         }
-        dlgAlert.setMessage(Text);
+        if(Text.replace(" ","").equals("")){
+            Text = "Keine weiteren Informationnen vorhanden.";
+        }
+        dlgAlert.setMessage(Html.fromHtml(Text));
         dlgAlert.setTitle(Title);
         dlgAlert.setPositiveButton("Ok",
                 new DialogInterface.OnClickListener() {
@@ -776,7 +826,7 @@ public class MainActivity extends AppCompatActivity
             case 1: return Color.CYAN;
             case 2: return Color.BLUE;
             case 3: return Color.GREEN;
-            case 4: return Color.DKGRAY;
+            case 4: return Color.BLACK;
         }
         return Color.DKGRAY;
     }
