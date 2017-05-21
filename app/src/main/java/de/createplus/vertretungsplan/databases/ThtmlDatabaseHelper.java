@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.IdentityHashMap;
 
+import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.backgroundservices.Pair;
 import de.createplus.vertretungsplan.listview.Parent;
 
@@ -77,6 +78,10 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
 
 
     public String getHtml() {
+        boolean A = false;
+        if ((MainActivity.TomorrowWeek % 2) == 0) {
+            A = true;
+        }
         String[] projection = {
                 ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK,
                 ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS,
@@ -99,15 +104,28 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
                 sortOrder
         );
         String result = "";
+        boolean first = true;
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             do {
-                result += cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML)) + "\n";
+                if (first) {
+                    result += cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML));
+                    first = false;
+                } else {
+                    boolean lineisA = cursor.getInt(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK)) % 2 == 0;
+                    if ((lineisA && A) || (!lineisA && !A)) {
+                        result = cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML)) + "\n" + result;
+                    }
+                    if ((lineisA && !A) || (!lineisA && A)) {
+                        result = result + "\n" + cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML));
+                    }
+                }
             } while (cursor.moveToNext());
             cursor.close();
         }
         return result;
     }
+
     public Pair getClassWeek() {
         String[] projection = {
                 ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK,
@@ -133,15 +151,15 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
         String[] b = new String[2];
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
-            int i=0;
+            int i = 0;
             do {
                 String x = cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK));
                 String y = cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS));
 
-                if(i==0 && Integer.parseInt(y) > 0){
+                if (i == 0 && Integer.parseInt(y) > 0) {
                     a[0] = x;
                     a[1] = y;
-                }else if(i==1 && Integer.parseInt(y) > 0){
+                } else if (i == 1 && Integer.parseInt(y) > 0) {
                     b[0] = x;
                     b[1] = y;
                 }
@@ -150,7 +168,7 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
             cursor.close();
         }
-        return new Pair(a,b) ;
+        return new Pair(a, b);
     }
 
     public ArrayList<Parent> getPlan(String date) {
@@ -204,7 +222,7 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
                         TEXT = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_TEXT)),
                         PLANINFO = cursor.getString(cursor.getColumnIndexOrThrow(SPContract.SPEntry.COLUMN_NAME_PLANINFO));
                 String[] CLASSSPLIT = CLASS.split(" ");
-                CLASS = CLASSSPLIT[CLASSSPLIT.length-1];
+                CLASS = CLASSSPLIT[CLASSSPLIT.length - 1];
                 //Log.e("VERTRETUNGSPLAN", ""+DATE);
                 //Log.e("VERTRETUNGSPLANPARENT", currentparent.getTitle());
                 if (currentparent == null) {
@@ -224,17 +242,17 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
                     currentparent = new Parent();
                     currentparent.setTitle(CLASS);
                     String out = "";
-                    if(KIND.equals("Sondereins.")){
+                    if (KIND.equals("Sondereins.")) {
                         out = TEXT + " " + " in der " + HOUR + " Stunde   Raum:" + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
-                    }else{
+                    } else {
                         out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
                     }
                     arrayChildren.add(out);
                 } else {
                     String out = "";
-                    if(KIND.equals("Sondereins.")){
+                    if (KIND.equals("Sondereins.")) {
                         out = TEXT + " " + " in der " + HOUR + " Stunde   Raum:" + NEWROOM + " SPLITPOINT " + "Keine weiteren Informationen vorhanden!";
-                    }else{
+                    } else {
                         out = COURSE + " " + KIND + " in der " + HOUR + " Stunde   Raum:" + ROOM + " -> " + NEWROOM + " SPLITPOINT " + TEXT;
                     }
                     arrayChildren.add(out);
@@ -281,7 +299,7 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
         return result.split("$$SPLITPOINT$$");
     }
 
-    public String getSavedClass(){
+    public String getSavedClass() {
         String[] projection = {
                 ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK,
                 ThtmlContract.ThtmlEntry.COLUMN_NAME_CLASS,
@@ -307,7 +325,7 @@ public class ThtmlDatabaseHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
             do {
                 String[] a = cursor.getString(cursor.getColumnIndexOrThrow(ThtmlContract.ThtmlEntry.COLUMN_NAME_HTML)).split("<font size=\"7\" face=\"Arial\" color=\"#0000FF\">[AB]: ");
-                if(a.length >1){
+                if (a.length > 1) {
                     return a[1].split(" &nbsp;</font> ")[0];
                 }
 

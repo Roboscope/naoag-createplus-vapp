@@ -29,7 +29,7 @@
             <item
                     android:id="@+id/nav_send"
                     android:icon="@drawable/ic_menu_share"
-                    android:title="Google-Kalender Sync."/>
+                    android:title="Google-Kalender Sync. [WIP]"/>
             <item
                 android:id="@+id/nav_Credits"
                 android:icon="?android:attr/listChoiceIndicatorSingle"

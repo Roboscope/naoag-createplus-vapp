@@ -191,6 +191,9 @@ public class UpdateTimetable extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
     public void studentModeUpdate(){
+        Timetable.urlArchive = "http://gymnasium-wuerselen.de/untis/Schueler-Stundenplan/";
+        Timetable.varname = "classes";
+
         ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String classPref = sharedPref.getString(SettingsActivity.KEY_STUFE, "");
@@ -214,14 +217,16 @@ public class UpdateTimetable extends IntentService {
         }
         //SQLiteDatabase WBdb = db.getWritableDatabase();
         //WBdb.delete(ThtmlContract.ThtmlEntry.TABLE_NAME, ThtmlContract.ThtmlEntry.COLUMN_NAME_CALENDARWEEK + " < ?", new String[]{"1"});
+
         try{
             Pair pref = getTimtableIndex(studentUSERNAMEPref,studentPASSWORDPref);
             MainActivity.TimetableIndex = pref;
         }catch (IOException e){
+            e.printStackTrace();
             //db.addLine("0","0","<html> Offline Modus: Der Plan könnte veraltet sein! <html>");
             return;
         }
-        if(MainActivity.TimetableIndex.a != null){
+        if(MainActivity.TimetableIndex.a == null){
             return;
         }
 
@@ -235,7 +240,7 @@ public class UpdateTimetable extends IntentService {
         weeks[0] = Integer.parseInt(weekCurrent[0].replace("\"",""));
         weeks[1] = Integer.parseInt(weekNext[0].replace("\"",""));
 
-
+        Log.e("Update Timetable: ","Done Loading");
         Pair inSQL = db.getClassWeek();
         int testifequal = 0;
         //Log.e("inSQL", inSQL + "");
