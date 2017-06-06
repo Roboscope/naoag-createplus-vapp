@@ -37,6 +37,7 @@ public class UpdatePlanDataReceiver extends BroadcastReceiver {
 
         //activity.Plan = intent.getExtras().getString(UpdatePlanData.Constants.EXTENDED_DATA_STATUS);
         MainActivity.updating = false;
+        MainActivity.mSwipeRefreshLayout.setRefreshing(false);
 
 
     }

@@ -28,6 +28,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -106,6 +107,7 @@ public class MainActivity extends AppCompatActivity
     static public boolean updating = false;
     static public int width = 0;
     static public int height = 0;
+    static public  SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,13 +139,16 @@ public class MainActivity extends AppCompatActivity
         THIS = this;
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String defsite = sharedPref.getString(SettingsActivity.KEY_COURSE_DEFAULTSITE, "1");
+        boolean updateSupPlan = false;
         if (currentContent == null) {
             switch (defsite) {
                 case "1":
                     currentContent = ContentViews.OVERVIEW;
+                    updateSupPlan = true;
                     break;
                 case "2":
                     currentContent = ContentViews.SUBSTITUTIONPLAN;
+                    updateSupPlan = true;
                     break;
                 case "3":
                     currentContent = ContentViews.TIMETABLE;
@@ -174,9 +179,12 @@ public class MainActivity extends AppCompatActivity
                     updating = true;
                     Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
                     MainActivity.this.startService(mServiceIntent);
+                    MainActivity.mSwipeRefreshLayout.setRefreshing(true);
                 }
             }
         });
+
+
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -189,6 +197,13 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         updateContainerContent();
+
+        if (!updating && updateSupPlan) {
+            updating = true;
+            Intent UpdateIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+            MainActivity.this.startService(UpdateIntent);
+            MainActivity.mSwipeRefreshLayout.setRefreshing(true);
+        }
         setupInterstitial();
         if (appInstalledOrNot("de.gymnasium_wuerselen.vertretungsplan")) {
             android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
@@ -414,6 +429,18 @@ public class MainActivity extends AppCompatActivity
 
         if (currentContent == ContentViews.OVERVIEW) {
             setTitle("Übersicht");
+            mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+            mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    if (!updating) {
+                        updating = true;
+                        Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+                        MainActivity.this.startService(mServiceIntent);
+                    }
+                }
+            });
+
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             boolean teacherMode = sharedPref.getBoolean(SettingsActivity.KEY_TEACHERMODE, false);
@@ -433,6 +460,17 @@ public class MainActivity extends AppCompatActivity
             loadBanner(0);
         } else if (currentContent == ContentViews.SUBSTITUTIONPLAN) {
             setTitle("Vertretungsplan");
+            mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+            mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
+                    if (!updating) {
+                        updating = true;
+                        Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+                        MainActivity.this.startService(mServiceIntent);
+                    }
+                }
+            });
             updateDate();
             findViewById(R.id.subplan_textfield).setVisibility(View.INVISIBLE);
             findViewById(R.id.fab).setVisibility(View.VISIBLE);
@@ -511,7 +549,7 @@ public class MainActivity extends AppCompatActivity
             ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
             String tmp = db.getHtml();
             //TABLE.loadData(tmp, "text/html", "UTF-8");
-            TABLE.loadDataWithBaseURL("fake://fake.de", tmp+"<html><br/><br/><br/><br/><br/></html>", "text/html", "UTF-8", null);
+            TABLE.loadDataWithBaseURL("fake://fake.de", tmp + "<html><br/><br/><br/><br/><br/></html>", "text/html", "UTF-8", null);
             TABLE.getSettings().setBuiltInZoomControls(true);
             TABLE.getSettings().setDisplayZoomControls(false);
             TABLE.setLongClickable(false);

@@ -32,6 +32,7 @@
         android:layout_centerHorizontal="true"
         android:paddingTop="30dp">
 
+
         <TableLayout
             android:id="@+id/overview_tablelayout_outer"
             android:layout_width="wrap_content"
@@ -146,6 +147,18 @@
 
         </TableLayout>
     </LinearLayout>
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swiperefresh"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:visibility="invisible"
+            >
+        </ListView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
     <com.google.android.gms.ads.AdView
         android:id="@+id/adBanner"
