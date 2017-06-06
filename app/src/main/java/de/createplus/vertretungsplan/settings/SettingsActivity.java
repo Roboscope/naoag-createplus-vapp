@@ -141,6 +141,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         }
         EditTextPreference editTextPreference = (EditTextPreference) findPreference(KEY_CHEATCODES);
         editTextPreference.setText("");
+        if(key.equals(SettingsActivity.KEY_STUFE)){
+            finish();
+        }
     }
 
     protected static void setListPreferenceDataCLASS(ListPreference lp) {

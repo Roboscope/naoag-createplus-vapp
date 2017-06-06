@@ -28,7 +28,9 @@
         android:layout_height="wrap_content"
         android:text="Kein Plan vorhanden."
         android:layout_below="@+id/adBanner"
-        />
+        android:layout_centerHorizontal="true"
+        android:paddingTop="20dp"
+        android:textSize="18sp"/>
 
     <ExpandableListView
         android:id="@+id/expandable_list"

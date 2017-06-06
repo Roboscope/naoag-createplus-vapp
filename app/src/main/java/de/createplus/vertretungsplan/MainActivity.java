@@ -109,22 +109,23 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         width = size.x;
         height = size.y;
-        Log.e("Main Screen Hight",""+height);
+        Log.e("Main Screen Hight", "" + height);
         super.onCreate(savedInstanceState);
 
-        if(android.os.Build.VERSION.SDK_INT >= 21){
+        if (android.os.Build.VERSION.SDK_INT >= 21) {
             Window window = this.getWindow();
             // clear FLAG_TRANSLUCENT_STATUS flag:
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             // finally change the color
-            window.setStatusBarColor(ContextCompat.getColor(this,R.color.colorPrimaryDark));
+            window.setStatusBarColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
         }
 
 
@@ -189,9 +190,26 @@ public class MainActivity extends AppCompatActivity
 
         updateContainerContent();
         setupInterstitial();
+        if (appInstalledOrNot("de.gymnasium_wuerselen.vertretungsplan")) {
+            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+            builder.setTitle("Alte Version gefunden!")
+                    .setMessage("Eine alte Version der App ist bereits auf diesem System installiert. Wollen sie diese deinstallieren?")
+                    .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
+                            Intent intent = new Intent(Intent.ACTION_DELETE);
+                            intent.setData(Uri.parse("package:de.gymnasium_wuerselen.vertretungsplan"));
+                            startActivity(intent);
 
+                        }
+                    })
+                    .setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
 
+                        }
+                    });
+            builder.create().show();
+        }
     }
 
     private void setupBackgoundtasks() {
@@ -310,16 +328,16 @@ public class MainActivity extends AppCompatActivity
             Intent myIntent = new Intent(MainActivity.this, SettingsActivity.class);
             MainActivity.this.startActivity(myIntent);
             return true;
-        }else if (id == R.id.action_credits) {
+        } else if (id == R.id.action_credits) {
             android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
             String version = "4.0.4";
             try {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 version = pInfo.versionName;
-            }catch (Exception e ){
+            } catch (Exception e) {
 
             }
-            String text = "<br /><b>Vertretungsplanapp</b><br />Version: "+version+"<br /><br />Entwickelt von:<br /><b>Max Nuglisch</b><br /><br />Design & Logo:<br /><b>Jonas Leuchtenberger</b><br /><br />Veröffentlicht von:<br /><b>CreatePlus GmbH.</b><br /><br />Website:<br /><b>createplus.de</b><br />";
+            String text = "<br /><b>Vertretungsplanapp</b><br />Version: " + version + "<br /><br />Entwickelt von:<br /><b>Max Nuglisch</b><br /><br />Design & Logo:<br /><b>Jonas Leuchtenberger</b><br /><br />Veröffentlicht von:<br /><b>CreatePlus GmbH.</b><br /><br />Website:<br /><b>createplus.de</b><br />";
             TextView myMsg = new TextView(this);
             myMsg.setTextSize(20);
             myMsg.setText(Html.fromHtml(text));
@@ -365,10 +383,10 @@ public class MainActivity extends AppCompatActivity
             try {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 version = pInfo.versionName;
-            }catch (Exception e ){
+            } catch (Exception e) {
 
             }
-            String text = "<br /><b>Vertretungsplanapp</b><br />Version: "+version+"<br /><br />Entwickelt von:<br /><b>Max Nuglisch</b><br /><br />Design & Logo:<br /><b>Jonas Leuchtenberger</b><br /><br />Veröffentlicht von:<br /><b>CreatePlus GmbH.</b><br /><br />Website:<br /><b>createplus.de</b><br />";
+            String text = "<br /><b>Vertretungsplanapp</b><br />Version: " + version + "<br /><br />Entwickelt von:<br /><b>Max Nuglisch</b><br /><br />Design & Logo:<br /><b>Jonas Leuchtenberger</b><br /><br />Veröffentlicht von:<br /><b>CreatePlus GmbH.</b><br /><br />Website:<br /><b>createplus.de</b><br />";
             TextView myMsg = new TextView(this);
             myMsg.setTextSize(20);
             myMsg.setText(Html.fromHtml(text));
@@ -493,7 +511,7 @@ public class MainActivity extends AppCompatActivity
             ThtmlDatabaseHelper db = new ThtmlDatabaseHelper(this);
             String tmp = db.getHtml();
             //TABLE.loadData(tmp, "text/html", "UTF-8");
-            TABLE.loadDataWithBaseURL("fake://fake.de", tmp, "text/html", "UTF-8", null);
+            TABLE.loadDataWithBaseURL("fake://fake.de", tmp+"<html><br/><br/><br/><br/><br/></html>", "text/html", "UTF-8", null);
             TABLE.getSettings().setBuiltInZoomControls(true);
             TABLE.getSettings().setDisplayZoomControls(false);
             TABLE.setLongClickable(false);
@@ -543,13 +561,34 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupOverview() {
-        int tiltesize = height / 83;
-        int textsize = height / 106;
-        Log.e("setupOverview",tiltesize+"");
-        Log.e("setupOverview",textsize+"");
+        int shownHours = 0;
+        int tiltesize = height / 83;//23
+        int textsize = height / 106;//18
+        if (tiltesize < 20) {
+            tiltesize = 20;
+        }
+        if (textsize < 16) {
+            textsize = 16;
+        }
+        int padding = 20;
+        switch (tiltesize) {
+            case 18:
+                padding = 20;
+                break;
+            case 17:
+                padding = 14;
+                break;
+            case 16:
+                padding = 10;
+                break;
+        }
+
+
+        Log.e("setupOverview", tiltesize + "");
+        Log.e("setupOverview", textsize + "");
         TableLayout LayoutToday = (TableLayout) findViewById(R.id.overview_tablelayout_inner_A);
         TableLayout LayoutTomorrow = (TableLayout) findViewById(R.id.overview_tablelayout_inner_B);
-        TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
+        //TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
         TplanDatabaseHelper dbplan = new TplanDatabaseHelper(getApplicationContext());
         LinkedList<String[]> FullTimetable = dbplan.getPlan(getApplicationContext());
 
@@ -578,7 +617,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-        System.out.println(Arrays.toString(TodayEntries));
+        //System.out.println(Arrays.toString(TodayEntries));
 
         for (int i = 1; i < TodayEntries.length; i++) {
             if (TodayEntries[i] != null) {
@@ -586,48 +625,49 @@ public class MainActivity extends AppCompatActivity
                 String[] tmp = TodayEntries[i].split(" ");
                 SPDatabaseHelper db = new SPDatabaseHelper(MainActivity.this);
                 ThtmlDatabaseHelper dbFORCLASS = new ThtmlDatabaseHelper(this);
-                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(),tmp[0],TodayDate,i);
-                String[] sp =null;
+                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(), tmp[0], TodayDate, i);
+                String[] sp = null;
                 int changetypeNotFinal = 0; // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
-                if(spplan.size()>0){
-                    sp= spplan.get(0);
-                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
+                if (spplan.size() > 0) {
+                    sp = spplan.get(0);
+                    //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
                     //Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
-                    String Kind = sp[0].replace(" ","").toUpperCase();
-                    String Text = sp[5].replace(" ","").toUpperCase();
-                    if(Kind.equals("RAUM-VTR.")){
+                    String Kind = sp[0].replace(" ", "").toUpperCase();
+                    String Text = sp[5].replace(" ", "").toUpperCase();
+                    if (Kind.equals("RAUM-VTR.")) {
                         changetypeNotFinal = 2;
-                    }else if(  (Kind.equals("VERTRETUNG") && (Text.equals("SELBSTSTÄNDIGESARBEITEN")||Text.equals("SELBSTST.ARBEITEN")))  || Kind.equals("ENTFALL")){
+                    } else if ((Kind.equals("VERTRETUNG") && (Text.equals("SELBSTSTÄNDIGESARBEITEN") || Text.equals("SELBSTST.ARBEITEN"))) || Kind.equals("ENTFALL")) {
                         changetypeNotFinal = 3;
-                    }else if(Kind.equals("VERTRETUNG")){
+                    } else if (Kind.equals("VERTRETUNG")) {
                         changetypeNotFinal = 1;
-                    }else{
+                    } else {
                         changetypeNotFinal = 4;
                     }
                     //Log.e("setupOverview",""+changetypeNotFinal);
                 }
                 final int changetype = changetypeNotFinal;
 
-                if ((i + 1) <TodayEntries.length && TodayEntries[i + 1] != null) {
+                if ((i + 1) < TodayEntries.length && TodayEntries[i + 1] != null) {
                     TextView two = new TextView(MainActivity.this);
-                    two.setPadding(20, 20, 20, 20);
+                    two.setPadding(padding, padding, padding, padding);
                     two.setText(i + "");
                     two.setTextSize(textsize);
                     tr.addView(two);
                     for (int o = 0; o < tmp.length; o++) {
                         if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
-                        tw.setPadding(20, 20, 20, 20);
+                        tw.setPadding(padding, padding, padding, padding);
                         tw.setText(tmp[o].replace(" ", ""));
                         tw.setTextSize(textsize);
                         tw.setTextColor(getChangeColor(changetype));
                         tr.addView(tw);
+                        shownHours++;
                     }
                 } else {
 
 
                     TextView two = new TextView(MainActivity.this);
-                    two.setPadding(20, 20, 20, 20);
+                    two.setPadding(padding, padding, padding, padding);
                     two.setText(i + "/" + (i + 1));
                     two.setTextSize(textsize);
                     tr.addView(two);
@@ -635,29 +675,30 @@ public class MainActivity extends AppCompatActivity
                         if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setTextColor(Color.BLACK);
-                        tw.setPadding(20, 20, 20, 20);
+                        tw.setPadding(padding, padding, padding, padding);
 
                         tw.setTextSize(textsize);
-                        if(changetype == 2){
-                            if(o == 2){
+                        if (changetype == 2) {
+                            if (o == 2) {
                                 tw.setTextColor(getChangeColor(changetype));
                                 tmp[2] = sp[4];
                                 //Log.e("setupOverview",Arrays.toString(sp));
                             }
-                        }else{
+                        } else {
                             tw.setTextColor(getChangeColor(changetype));
                         }
                         tw.setText(tmp[o].replace(" ", ""));
                         tr.addView(tw);
+                        shownHours++;
                     }
 
-                    if(changetype != 0){
+                    if (changetype != 0) {
                         LinearLayout outerLayout = new LinearLayout(this);
                         ImageView picture = new ImageView(this);
                         outerLayout.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                onClickOverview(spplan.get(0),changetype);
+                                onClickOverview(spplan.get(0), changetype);
                             }
                         });
                         LinearLayout.LayoutParams pictureLayoutParams = new LinearLayout.LayoutParams(60, 60);
@@ -697,7 +738,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
-        System.out.println(Arrays.toString(TomorrowEntries));
+        //System.out.println(Arrays.toString(TomorrowEntries));
         //Log.e("setupOverview","-------------------------------------");
         for (int i = 1; i < TomorrowEntries.length; i++) {
 
@@ -706,45 +747,48 @@ public class MainActivity extends AppCompatActivity
                 String[] tmp = TomorrowEntries[i].split(" ");
                 SPDatabaseHelper db = new SPDatabaseHelper(MainActivity.this);
                 ThtmlDatabaseHelper dbFORCLASS = new ThtmlDatabaseHelper(this);
-                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(),tmp[0],TomorrowDate,i);
+                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(), tmp[0], TomorrowDate, i);
                 String[] sp = null;
                 int changetypeNotFinal = 0; // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
-                if(spplan.size()>0){
+                if (spplan.size() > 0) {
                     sp = spplan.get(0);
                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
-                    //Log.e("setupOverview",sp[0].replace(" ","").toUpperCase());
-                    String Kind = sp[0].replace(" ","").toUpperCase();
-                    String Text = sp[5].replace(" ","").toUpperCase();
-                    if(Kind.equals("RAUM-VTR.")){
+                    Log.e("setupOverview", sp[0].replace(" ", "").toUpperCase());
+                    Log.e("setupOverview", sp[5].replace(" ", "").toUpperCase());
+                    String Kind = sp[0].replace(" ", "").toUpperCase();
+                    String Text = sp[5].replace(" ", "").toUpperCase();
+                    if (Kind.equals("RAUM-VTR.")) {
                         changetypeNotFinal = 2;
-                    }else if(  (Kind.equals("VERTRETUNG") && (Text.equals("SELBSTSTÄNDIGESARBEITEN")||Text.equals("SELBSTST.ARBEITEN")))  || Kind.equals("ENTFALL")){
+                    } else if ((Kind.equals("VERTRETUNG") && (Text.contains("SELBSTST"))) || Kind.equals("ENTFALL")) {
                         changetypeNotFinal = 3;
-                    }else if(Kind.equals("VERTRETUNG")){
+                    } else if (Kind.equals("VERTRETUNG")) {
                         changetypeNotFinal = 1;
-                    }else{
+                    } else {
                         changetypeNotFinal = 4;
                     }
-                   // Log.e("setupOverview",""+changetypeNotFinal);
+                    // Log.e("setupOverview",""+changetypeNotFinal);
                 }
                 final int changetype = changetypeNotFinal;
-                if ((i + 1) <TomorrowEntries.length && TomorrowEntries[i + 1] != null) {
+                if ((i + 1) < TomorrowEntries.length && TomorrowEntries[i + 1] != null) {
                     TextView two = new TextView(MainActivity.this);
-                    two.setPadding(20, 20, 20, 20);
+                    two.setPadding(padding, padding, padding, padding);
                     two.setText(i + "");
                     two.setTextSize(textsize);
                     tr.addView(two);
+
                     for (int o = 0; o < tmp.length; o++) {
                         if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         //Log.e("O", "|" + tmp[o] + "|");
                         TextView tw = new TextView(MainActivity.this);
-                        tw.setPadding(20, 20, 20, 20);
+                        tw.setPadding(padding, padding, padding, padding);
                         tw.setText(tmp[o].replace(" ", ""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
+                        shownHours++;
                     }
                 } else {
                     TextView two = new TextView(MainActivity.this);
-                    two.setPadding(20, 20, 20, 20);
+                    two.setPadding(padding, padding, padding, padding);
                     two.setText(i + "/" + (i + 1));
                     two.setTextSize(textsize);
                     tr.addView(two);
@@ -752,28 +796,29 @@ public class MainActivity extends AppCompatActivity
                         if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
                         TextView tw = new TextView(MainActivity.this);
                         tw.setTextColor(Color.BLACK);
-                        tw.setPadding(20, 20, 20, 20);
+                        tw.setPadding(padding, padding, padding, padding);
                         //Log.e("O", "|" + tmp[o] + "|");
-                        if(changetype == 2){
-                            if(o == 2){
+                        if (changetype == 2) {
+                            if (o == 2) {
                                 tw.setTextColor(getChangeColor(changetype));
                                 tmp[2] = sp[4];
                                 //Log.e("setupOverview",Arrays.toString(sp));
                             }
-                        }else{
+                        } else {
                             tw.setTextColor(getChangeColor(changetype));
                         }
                         tw.setText(tmp[o].replace(" ", ""));
                         tw.setTextSize(textsize);
                         tr.addView(tw);
+                        shownHours++;
                     }
-                    if(changetype != 0){
+                    if (changetype != 0) {
                         LinearLayout outerLayout = new LinearLayout(this);
                         ImageView picture = new ImageView(this);
                         outerLayout.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                onClickOverview(spplan.get(0),changetype);
+                                onClickOverview(spplan.get(0), changetype);
                             }
                         });
                         LinearLayout.LayoutParams pictureLayoutParams = new LinearLayout.LayoutParams(60, 60);
@@ -787,10 +832,15 @@ public class MainActivity extends AppCompatActivity
 
                     i++;
                 }
-
                 LayoutTomorrow.addView(tr);
             }
-
+        }
+        if (shownHours == 0) {
+            TextView hi = (TextView) findViewById(R.id.overview_textview_teacher);
+            hi.setText("Um die Übersicht zu benutzen musst du in den Einstellungen deine Kurse auswählen.");
+            hi.setVisibility(View.VISIBLE);
+            LinearLayout layout = (LinearLayout) findViewById(R.id.overview_layout);
+            layout.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -812,23 +862,34 @@ public class MainActivity extends AppCompatActivity
         }*/
     }
 
-    private void onClickOverview(String[] sp, int change){ //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;change 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
-        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+    private void onClickOverview(String[] sp, int change) { //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;change 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+        AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
         String Title = "";
         String Text = "";
 
 
-        switch (change){
-            case 1: Title = "Vertretung:";Text = "<b>In Raum:</b> " + sp[4]; break;
-            case 2: Title = "Raumwechsel:";Text = "<b>Alter Raum:</b> " + sp[2] + "<br/><b>Neuer Raum:</b> "+sp[4]; break;
-            case 3: Title = "Entfall:"; break;
-            case 4: Title = sp[0];Text = "<b>Alter Raum:</b> " + sp[2] + "<br/><b>Neuer Raum:</b> "+sp[4];break;
+        switch (change) {
+            case 1:
+                Title = "Vertretung:";
+                Text = "<b>In Raum:</b> " + sp[4];
+                break;
+            case 2:
+                Title = "Raumwechsel:";
+                Text = "<b>Alter Raum:</b> " + sp[2] + "<br/><b>Neuer Raum:</b> " + sp[4];
+                break;
+            case 3:
+                Title = "Entfall:";
+                break;
+            case 4:
+                Title = sp[0];
+                Text = "<b>Alter Raum:</b> " + sp[2] + "<br/><b>Neuer Raum:</b> " + sp[4];
+                break;
         }
         //Log.e("setupOverview", "|"+sp[5].replace(" ","")+"|");
-        if(sp[5].replace(" ","").length() > 2){
-            Text = Text + "<br/><b>Infos:</b> "+sp[5];
+        if (sp[5].replace(" ", "").length() > 2) {
+            Text = Text + "<br/><b>Infos:</b> " + sp[5];
         }
-        if(Text.replace(" ","").equals("")){
+        if (Text.replace(" ", "").equals("")) {
             Text = "Keine weiteren Informationnen vorhanden.";
         }
         dlgAlert.setMessage(Html.fromHtml(Text));
@@ -842,14 +903,29 @@ public class MainActivity extends AppCompatActivity
         dlgAlert.create().show();
     }
 
-    private int getChangeColor(int type){// 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
-        switch (type){
-            case 0: return Color.DKGRAY;
-            case 1: return Color.CYAN;
-            case 2: return Color.BLUE;
-            case 3: return Color.GREEN;
-            case 4: return Color.BLACK;
+    private int getChangeColor(int type) {// 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+        switch (type) {
+            case 0:
+                return Color.DKGRAY;
+            case 1:
+                return Color.CYAN;
+            case 2:
+                return Color.BLUE;
+            case 3:
+                return Color.GREEN;
+            case 4:
+                return Color.BLACK;
         }
         return Color.DKGRAY;
+    }
+
+    private boolean appInstalledOrNot(String uri) {
+        PackageManager pm = getPackageManager();
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+        }
+        return false;
     }
 }

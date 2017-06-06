@@ -7,8 +7,8 @@ android {
         applicationId "de.createplus.vertretungsplan"
         minSdkVersion 16
         targetSdkVersion 19
-        versionCode 13
-        versionName '1.0.7_overview'
+        versionCode 15
+        versionName '1.0.9_torelease'
     }
     buildTypes {
         release {
