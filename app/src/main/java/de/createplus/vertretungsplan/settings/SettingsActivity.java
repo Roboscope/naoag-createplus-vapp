@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -21,6 +22,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
@@ -29,6 +31,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.Target;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -59,6 +64,12 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
     public static final String KEY_COURSE_SELECTION = "pref_key_list_timetableselection";
     public static final String KEY_COURSE_DEFAULTSITE = "pref_key_list_defaultview";
     public static final String KEY_CHEATCODES = "pref_key_cheatcodes";
+
+    static public SwipeRefreshLayout mSwipeRefreshLayout;
+    private ShowcaseView showcaseview;
+    private Target Logins,Stufe,Kurse;
+    boolean inTut;
+    String tutTextLogins,tutTextStufe,tutTextKurse;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,6 +111,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
+        Tutorial();
+        //setShowCase(2);
     }
 
     @Override
@@ -197,4 +210,50 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(1, mBuilder.build());
 
-}}
+}
+
+    public void Tutorial(){
+
+        Logins=new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(MainActivity.width /10,MainActivity.height/10);
+            }
+        };
+        Stufe=new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(290,150);
+            }
+        };
+        Kurse=new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(290,1350);
+            }
+        };
+
+        tutTextLogins="Login//Als erstes müssen die Login Daten angegeben werden.";
+        tutTextStufe="B//2";
+        tutTextKurse="C//3";
+        inTut = true;
+
+
+        showcaseview = new ShowcaseView.Builder(this).setTarget(Target.NONE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showcaseview.hide();
+            }
+        }).setContentTitle("Test").setContentText("Dies ist ein Test").setStyle(R.style.AppTheme_AppBarOverlay).build();
+        setShowCase(1);
+        showcaseview.setButtonText("Abbrechen");
+        setShowCase(1);
+    }
+    public void setShowCase(int i){// 1=SliderBtn 2=SliderMainAreas
+        switch (i){
+            case 1: MainActivity.THIS.currentShowcase=1; showcaseview.setShowcase(Logins,true); showcaseview.setContentText(tutTextLogins.split("//")[1]); showcaseview.setContentTitle(tutTextLogins.split("//")[0]);break;
+            case 2: MainActivity.THIS.currentShowcase=2; showcaseview.setShowcase(Stufe,true); showcaseview.setContentText(tutTextStufe.split("//")[1]); showcaseview.setContentTitle(tutTextStufe.split("//")[0]);break;
+            case 3: MainActivity.THIS.currentShowcase=3; showcaseview.setShowcase(Kurse,true); showcaseview.setContentText(tutTextKurse.split("//")[1]); showcaseview.setContentTitle(tutTextKurse.split("//")[0]);break;
+        }
+    }
+}

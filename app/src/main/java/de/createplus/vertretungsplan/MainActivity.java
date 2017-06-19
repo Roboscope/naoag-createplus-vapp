@@ -30,6 +30,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -50,6 +51,10 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.*;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ActionViewTarget;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -108,6 +113,11 @@ public class MainActivity extends AppCompatActivity
     static public int width = 0;
     static public int height = 0;
     static public  SwipeRefreshLayout mSwipeRefreshLayout;
+    private ShowcaseView showcaseview;
+    private Target  SliderBtn,SliderMainAreas,Settings,ClassSetting;
+    boolean inTut, waitingForSlider, waitingForSwiping, waitingForSettings;
+    String tutTextSilderBtn,tutTextSliderMainAreas,tutTextSettings, tutTextClass;
+    public int currentShowcase=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -192,6 +202,32 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+        drawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                //currentShowcase=2; showcaseview.setShowcase(SliderMainAreas,true);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                if(inTut && currentShowcase == 1){
+                    setShowCase(3);
+                }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                if(inTut && currentShowcase == 3){
+                    setShowCase(1);
+                }
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -205,6 +241,8 @@ public class MainActivity extends AppCompatActivity
             MainActivity.mSwipeRefreshLayout.setRefreshing(true);
         }
         setupInterstitial();
+
+        // ALTE APP
         if (appInstalledOrNot("de.gymnasium_wuerselen.vertretungsplan")) {
             android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
             builder.setTitle("Alte Version gefunden!")
@@ -225,6 +263,22 @@ public class MainActivity extends AppCompatActivity
                     });
             builder.create().show();
         }
+
+        // TUTORIAL
+        /*android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle("Einführung")
+                .setMessage("Möchtest du eine kurze Einführung in die Grundfunktionen dieser App erhalten?")
+                .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Tutorial();
+                    }
+                })
+                .setNegativeButton("Nein", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        builder.create().show();*/
     }
 
     private void setupBackgoundtasks() {
@@ -327,6 +381,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -441,7 +496,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
-            findViewById(R.id.fab).setVisibility(View.VISIBLE);
+            //findViewById(R.id.fab).setVisibility(View.VISIBLE);
             SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
             boolean teacherMode = sharedPref.getBoolean(SettingsActivity.KEY_TEACHERMODE, false);
             if (teacherMode) {
@@ -454,6 +509,8 @@ public class MainActivity extends AppCompatActivity
                 TitleToday1.setVisibility(View.INVISIBLE);
                 setupOverview();
             }
+            /*android.support.v4.widget.SwipeRefreshLayout l = (android.support.v4.widget.SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+            l.bringToFront();*/
             //WebView web = (WebView) findViewById(R.id.overview_webview);
             //web.loadData("<html>    <link href=\"https://fonts.googleapis.com/css?family=Source+Sans+Pro\" rel=\"stylesheet\">    <link href=\"https://fonts.googleapis.com/css?family=Open+Sans\" rel=\"stylesheet\">    <style>        .coupon {            width: 250px;            padding: 10px;            text-align: center;            border: 3px dashed #0099ff; }        .t {            font-family: 'Source Sans Pro', sans-serif; }        .z {            font-family: 'Open Sans', sans-serif; }    </style>    <table cellspacing=\"10\" class=\"t\"><tr class=\"z\"><th>Heute: Montag,<br>06.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr><tr class=\"z\"><th><br>Morgen: Dienstag,<br>07.03.2017</th></tr><tr><td><table class=\"coupon\"><tr><td><sup style=\"font-size:10px\">1</sup>/<sub style=\"font-size:10px\">2</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr><tr><td><sup style=\"font-size:10px\">3</sup>/<sub style=\"font-size:10px\">4</sub></td><td style=\"color: #33cc33\">Ge1</td><td style=\"color: #33cc33\">Wem</td><td style=\"color: #33cc33\">403</td></tr><tr><td><sup style=\"font-size:10px\">5</sup>/<sub style=\"font-size:10px\">6</sub></td><td>E3</td><td>Ad</td><td>402</td></tr><tr><td><sup style=\"font-size:10px\">7</sup>/<sub style=\"font-size:10px\">8</sub></td><td>D1</td><td>Kru</td><td>A06</td></tr></table></td></tr></table> </html>\n", "text/html", null);
             //ADS
@@ -674,7 +731,7 @@ public class MainActivity extends AppCompatActivity
                     String Text = sp[5].replace(" ", "").toUpperCase();
                     if (Kind.equals("RAUM-VTR.")) {
                         changetypeNotFinal = 2;
-                    } else if ((Kind.equals("VERTRETUNG") && (Text.equals("SELBSTSTÄNDIGESARBEITEN") || Text.equals("SELBSTST.ARBEITEN"))) || Kind.equals("ENTFALL")) {
+                    } else if ((Kind.equals("VERTRETUNG") && (Text.contains("SELBSTST"))) || Kind.equals("ENTFALL")) {
                         changetypeNotFinal = 3;
                     } else if (Kind.equals("VERTRETUNG")) {
                         changetypeNotFinal = 1;
@@ -745,6 +802,7 @@ public class MainActivity extends AppCompatActivity
                         //picture.setPadding(0, 35, 10, 0);
 
                         outerLayout.addView(picture, pictureLayoutParams);
+                        outerLayout.bringToFront();
                         tr.addView(outerLayout);
                     }
                     i++;
@@ -865,6 +923,7 @@ public class MainActivity extends AppCompatActivity
                         //picture.setPadding(0, 35, 10, 0);
 
                         outerLayout.addView(picture, pictureLayoutParams);
+                        outerLayout.bringToFront();
                         tr.addView(outerLayout);
                     }
 
@@ -884,9 +943,9 @@ public class MainActivity extends AppCompatActivity
 
     private void loadBanner(int i) {
 
-        mAdView = (AdView) findViewById(R.id.adBanner);
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2C75B378313C32C7D50757BB562FF544").build();
-        mAdView.loadAd(adRequest);
+        //mAdView = (AdView) findViewById(R.id.adBanner);
+        //AdRequest adRequest = new AdRequest.Builder().addTestDevice("2C75B378313C32C7D50757BB562FF544").build();
+        //mAdView.loadAd(adRequest);
         /*if (i == 1) {
             RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
                     ViewGroup.LayoutParams.FILL_PARENT);
@@ -965,5 +1024,97 @@ public class MainActivity extends AppCompatActivity
         } catch (PackageManager.NameNotFoundException e) {
         }
         return false;
+    }
+
+    private void checkFirstRun() {
+
+        final String PREFS_NAME = "MyPrefsFile";
+        final String PREF_VERSION_CODE_KEY = "version_code";
+        final int DOESNT_EXIST = -1;
+
+        // Get current version code
+        int currentVersionCode = BuildConfig.VERSION_CODE;
+
+        // Get saved version code
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        int savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST);
+
+        // Check for first run or upgrade
+        if (currentVersionCode == savedVersionCode) {
+
+            // This is just a normal run
+            return;
+
+        } else if (savedVersionCode == DOESNT_EXIST) {
+
+            // TODO This is a new install (or the user cleared the shared preferences)
+
+        } else if (currentVersionCode > savedVersionCode) {
+
+            // TODO This is an upgrade
+        }
+
+        // Update the shared preferences with the current version code
+        prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply();
+    }
+
+    public void Tutorial(){
+        SliderBtn= new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(width/10,height/10);
+            }
+        };
+
+        SliderMainAreas=new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(width/10,(int)(height*0.7));
+            }
+        };
+
+        Settings=new Target() {
+             @Override
+            public Point getPoint() {
+                return new Point((int)(width*0.25),(int)(height*0.72));
+            }
+        };
+
+        ClassSetting=new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(50,70);
+            }
+        };
+
+        tutTextSilderBtn="Hauptmenü//Das Hauptmenü kannst du durch diesen Button oder durch wischen nach rechts erreichen.";
+        tutTextSliderMainAreas="Einstellungen//Um die App benutzen zu können muss du erst einige Einstellungen tätigen."; // not Setup
+        tutTextSettings="Einstellungen//Um die App benutzen zu können muss du erst einige Einstellungen tätigen.";
+        tutTextClass="D//4";
+        inTut = true;
+
+
+        showcaseview = new ShowcaseView.Builder(this).setTarget(Target.NONE).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                /*switch (currentShowcase){
+                    case 1: currentShowcase=2; showcaseview.setShowcase(SliderMainAreas,true);break;
+                    case 2: break;
+                    case 3: break;
+                }*/
+                //showcaseview.setShowcase(Target.NONE,false);
+                showcaseview.hide();
+            }
+        }).setContentTitle("Test").setContentText("Dies ist ein Test").setStyle(R.style.AppTheme_AppBarOverlay).build();
+        setShowCase(1);
+        showcaseview.setButtonText("Abbrechen");
+    }
+
+    public void setShowCase(int i){// 1=SliderBtn 2=SliderMainAreas
+        switch (i){
+            case 1: currentShowcase=1; showcaseview.setShowcase(SliderBtn,true); showcaseview.setContentText(tutTextSilderBtn.split("//")[1]); showcaseview.setContentTitle(tutTextSilderBtn.split("//")[0]);break;
+            case 2: currentShowcase=2; showcaseview.setShowcase(SliderMainAreas,true); showcaseview.setContentText(tutTextSliderMainAreas.split("//")[1]); showcaseview.setContentTitle(tutTextSliderMainAreas.split("//")[0]);break;
+            case 3: currentShowcase=3; showcaseview.setShowcase(Settings,true); showcaseview.setContentText(tutTextSettings.split("//")[1]); showcaseview.setContentTitle(tutTextSettings.split("//")[0]);break;
+        }
     }
 }

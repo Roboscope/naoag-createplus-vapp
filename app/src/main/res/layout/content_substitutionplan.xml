@@ -35,7 +35,9 @@
     <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+
+        android:layout_marginBottom="57dp"><!--android:layout_below="@+id/adBanner"-->
 
 
         <ExpandableListView
@@ -45,8 +47,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_below="@+id/adBanner"
-            android:layout_marginBottom="57dp"
+
+
             android:cacheColorHint="#00000000"
             android:listSelector="@android:color/transparent"
             android:transcriptMode="alwaysScroll" />
