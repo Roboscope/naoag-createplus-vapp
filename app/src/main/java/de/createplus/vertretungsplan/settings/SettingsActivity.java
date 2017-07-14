@@ -67,25 +67,24 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
     static public SwipeRefreshLayout mSwipeRefreshLayout;
     private ShowcaseView showcaseview;
-    private Target Logins,Stufe,Kurse;
-    boolean inTut;
-    String tutTextLogins,tutTextStufe,tutTextKurse;
+    private Target Logins, Stufe, Kurse;
+    String tutTextLogins, tutTextStufe, tutTextKurse;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.settings_overview);
         //ListPreference lp = (ListPreference) findViewById();
-        if(MainActivity.TimetableIndex != null) {
+        if (MainActivity.TimetableIndex != null) {
             final ListPreference listPreference = (ListPreference) findPreference("pref_key_list_class");
             setListPreferenceDataCLASS(listPreference);
         }
 
         TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
         LinkedList<String[]> coursesall = dbgroups.getAllCourses();
-        if(coursesall.size() > 0) {
+        if (coursesall.size() > 0) {
             final MultiSelectListPreference listPreference = (MultiSelectListPreference) findPreference(KEY_COURSE_SELECTION);
-            setListPreferenceDataCOURSE(listPreference,coursesall);
+            setListPreferenceDataCOURSE(listPreference, coursesall);
         }
         EditTextPreference editTextPreference = (EditTextPreference) findPreference(KEY_CHEATCODES);
         editTextPreference.setText("");
@@ -127,34 +126,34 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         TgroupsDatabaseHelper dbgroups = new TgroupsDatabaseHelper(getApplicationContext());
         SQLiteDatabase wdb = dbgroups.getWritableDatabase();
         ContentValues val = new ContentValues();
-        val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED,"0");
-        wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME,val,TgroupsContract.TgroupsEntry._ID + " > ?",  new String[]{"0"});
+        val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED, "0");
+        wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME, val, TgroupsContract.TgroupsEntry._ID + " > ?", new String[]{"0"});
 
-        if(courseSET != null){
+        if (courseSET != null) {
             String[] tmp = new String[courseSET.size()];
             int o = 0;
-            for (String i : courseSET){
+            for (String i : courseSET) {
                 tmp[o] = i;
                 o++;
             }
 
             val = new ContentValues();
-            val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED,"1");
-            for(int i = 0; i < tmp.length;i++){
-                wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME,val,TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?",  new String[]{tmp[i]});
+            val.put(TgroupsContract.TgroupsEntry.COLUMN_NAME_ENABLED, "1");
+            for (int i = 0; i < tmp.length; i++) {
+                wdb.update(TgroupsContract.TgroupsEntry.TABLE_NAME, val, TgroupsContract.TgroupsEntry.COLUMN_NAME_COURSE + " = ?", new String[]{tmp[i]});
             }
             MainActivity.THIS.updateContainerContent();
         }
 
-        String cheatcode = sharedPref.getString(SettingsActivity.KEY_CHEATCODES,"");
-        if(cheatcode.contains("gtp")){
-            TempTeacherModeActivity.teacher = cheatcode.replace("gtp","").replace(" ","");
+        String cheatcode = sharedPref.getString(SettingsActivity.KEY_CHEATCODES, "");
+        if (cheatcode.contains("gtp")) {
+            TempTeacherModeActivity.teacher = cheatcode.replace("gtp", "").replace(" ", "");
             Intent myIntent = new Intent(this, TempTeacherModeActivity.class);
             this.startActivity(myIntent);
         }
         EditTextPreference editTextPreference = (EditTextPreference) findPreference(KEY_CHEATCODES);
         editTextPreference.setText("");
-        if(key.equals(SettingsActivity.KEY_STUFE)){
+        if (key.equals(SettingsActivity.KEY_STUFE)) {
             finish();
         }
     }
@@ -164,26 +163,26 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         CharSequence[] entries = Info.a;
         CharSequence[] entryValues = new CharSequence[entries.length];
-        for(int i = 0; i < entries.length; i++){
-            entryValues[i] = ""+(i+1);
+        for (int i = 0; i < entries.length; i++) {
+            entryValues[i] = "" + (i + 1);
         }
         lp.setEntries(entries);
         lp.setDefaultValue("1");
         lp.setEntryValues(entryValues);
     }
 
-    protected static void setListPreferenceDataCOURSE(MultiSelectListPreference lp,LinkedList<String[]> in) {
+    protected static void setListPreferenceDataCOURSE(MultiSelectListPreference lp, LinkedList<String[]> in) {
 
 
         CharSequence[] entries = new CharSequence[in.size()];
         CharSequence[] entryValues = new CharSequence[in.size()];
         Set<String> dafaultValues = new HashSet<String>();
 
-        for(int i = 0; 0 < in.size();i++){
+        for (int i = 0; 0 < in.size(); i++) {
             String[] tmp = in.remove();
             entries[i] = tmp[0];
             entryValues[i] = tmp[0];
-            if(Integer.parseInt(tmp[1])==1){
+            if (Integer.parseInt(tmp[1]) == 1) {
                 dafaultValues.add(tmp[0]);
             }
         }
@@ -210,50 +209,67 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(1, mBuilder.build());
 
-}
-
-    public void Tutorial(){
-
-        Logins=new Target() {
-            @Override
-            public Point getPoint() {
-                return new Point(MainActivity.width /10,MainActivity.height/10);
-            }
-        };
-        Stufe=new Target() {
-            @Override
-            public Point getPoint() {
-                return new Point(290,150);
-            }
-        };
-        Kurse=new Target() {
-            @Override
-            public Point getPoint() {
-                return new Point(290,1350);
-            }
-        };
-
-        tutTextLogins="Login//Als erstes müssen die Login Daten angegeben werden.";
-        tutTextStufe="B//2";
-        tutTextKurse="C//3";
-        inTut = true;
-
-
-        showcaseview = new ShowcaseView.Builder(this).setTarget(Target.NONE).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showcaseview.hide();
-            }
-        }).setContentTitle("Test").setContentText("Dies ist ein Test").setStyle(R.style.AppTheme_AppBarOverlay).build();
-        setShowCase(1);
-        showcaseview.setButtonText("Abbrechen");
-        setShowCase(1);
     }
-    public void setShowCase(int i){// 1=SliderBtn 2=SliderMainAreas
-        switch (i){
-            case 1: MainActivity.THIS.currentShowcase=1; showcaseview.setShowcase(Logins,true); showcaseview.setContentText(tutTextLogins.split("//")[1]); showcaseview.setContentTitle(tutTextLogins.split("//")[0]);break;
-            case 2: MainActivity.THIS.currentShowcase=2; showcaseview.setShowcase(Stufe,true); showcaseview.setContentText(tutTextStufe.split("//")[1]); showcaseview.setContentTitle(tutTextStufe.split("//")[0]);break;
-            case 3: MainActivity.THIS.currentShowcase=3; showcaseview.setShowcase(Kurse,true); showcaseview.setContentText(tutTextKurse.split("//")[1]); showcaseview.setContentTitle(tutTextKurse.split("//")[0]);break;
+
+    public void Tutorial() {
+
+        Logins = new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(MainActivity.width / 10, MainActivity.height / 10);
+            }
+        };
+        Stufe = new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(290, 150);
+            }
+        };
+        Kurse = new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(290, 1350);
+            }
+        };
+
+        tutTextLogins = "Login//Als erstes müssen die Login Daten angegeben werden.";
+        tutTextStufe = "B//2";
+        tutTextKurse = "C//3";
+
+        if (MainActivity.inTut) {
+            showcaseview = new ShowcaseView.Builder(this).setTarget(Target.NONE).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showcaseview.hide();
+                }
+            }).setContentTitle("Test").setContentText("Dies ist ein Test").setStyle(R.style.AppTheme_AppBarOverlay).build();
+
+            setShowCase(1);
+            showcaseview.setButtonText("Abbrechen");
+            setShowCase(1);
+        }
+    }
+
+    public void setShowCase(int i) {// 1=SliderBtn 2=SliderMainAreas
+        switch (i) {
+            case 1:
+                MainActivity.THIS.currentShowcase = 1;
+                showcaseview.setShowcase(Logins, true);
+                showcaseview.setContentText(tutTextLogins.split("//")[1]);
+                showcaseview.setContentTitle(tutTextLogins.split("//")[0]);
+                break;
+            case 2:
+                MainActivity.THIS.currentShowcase = 2;
+                showcaseview.setShowcase(Stufe, true);
+                showcaseview.setContentText(tutTextStufe.split("//")[1]);
+                showcaseview.setContentTitle(tutTextStufe.split("//")[0]);
+                break;
+            case 3:
+                MainActivity.THIS.currentShowcase = 3;
+                showcaseview.setShowcase(Kurse, true);
+                showcaseview.setContentText(tutTextKurse.split("//")[1]);
+                showcaseview.setContentTitle(tutTextKurse.split("//")[0]);
+                break;
         }
     }
 }

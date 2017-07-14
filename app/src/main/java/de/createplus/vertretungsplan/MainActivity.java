@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
     static public  SwipeRefreshLayout mSwipeRefreshLayout;
     private ShowcaseView showcaseview;
     private Target  SliderBtn,SliderMainAreas,Settings,ClassSetting;
-    boolean inTut, waitingForSlider, waitingForSwiping, waitingForSettings;
+    public static boolean inTut, waitingForSlider, waitingForSwiping, waitingForSettings;
     String tutTextSilderBtn,tutTextSliderMainAreas,tutTextSettings, tutTextClass;
     public int currentShowcase=0;
 
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // TUTORIAL
-        /*android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         builder.setTitle("Einführung")
                 .setMessage("Möchtest du eine kurze Einführung in die Grundfunktionen dieser App erhalten?")
                 .setPositiveButton("Ja", new DialogInterface.OnClickListener() {
@@ -278,7 +278,7 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 });
-        builder.create().show();*/
+        builder.create().show();
     }
 
     private void setupBackgoundtasks() {
@@ -328,7 +328,7 @@ public class MainActivity extends AppCompatActivity
         mInterstitialAd.loadAd(adRequest);
     }
 
-    public void updateDate() {
+    public static void updateDate() {
 
         Calendar calander = Calendar.getInstance();
         while (!((calander.get(Calendar.DAY_OF_WEEK) >= Calendar.MONDAY) && (calander.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY))) {
