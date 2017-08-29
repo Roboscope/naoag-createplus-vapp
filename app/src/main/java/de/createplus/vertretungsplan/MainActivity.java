@@ -265,6 +265,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // TUTORIAL
+        /*
         android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
         builder.setTitle("Einführung")
                 .setMessage("Möchtest du eine kurze Einführung in die Grundfunktionen dieser App erhalten?")
@@ -278,7 +279,7 @@ public class MainActivity extends AppCompatActivity
 
                     }
                 });
-        builder.create().show();
+        builder.create().show();*/
     }
 
     private void setupBackgoundtasks() {
@@ -943,10 +944,10 @@ public class MainActivity extends AppCompatActivity
 
     private void loadBanner(int i) {
 
-        //mAdView = (AdView) findViewById(R.id.adBanner);
-        //AdRequest adRequest = new AdRequest.Builder().addTestDevice("2C75B378313C32C7D50757BB562FF544").build();
-        //mAdView.loadAd(adRequest);
-        /*if (i == 1) {
+        mAdView = (AdView) findViewById(R.id.adBanner);
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("2C75B378313C32C7D50757BB562FF544").build();
+        mAdView.loadAd(adRequest);
+        if (i == 1) {
             RelativeLayout.LayoutParams p = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT,
                     ViewGroup.LayoutParams.FILL_PARENT);
 
@@ -956,7 +957,7 @@ public class MainActivity extends AppCompatActivity
 
             ExpandableListView exp = (ExpandableListView) findViewById(R.id.expandable_list);
             exp.setLayoutParams(p);
-        }*/
+        }
     }
 
     private void onClickOverview(String[] sp, int change) { //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;change 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt

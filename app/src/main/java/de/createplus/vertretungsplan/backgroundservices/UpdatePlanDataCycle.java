@@ -95,7 +95,7 @@ public class UpdatePlanDataCycle extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
-    private LinkedList<String[]> getChanges() {
+    private LinkedList<String[]> getChanges() {/*
         LinkedList<String[]> ret = new LinkedList<String[]>();
 
         MainActivity.updateDate();
@@ -122,7 +122,7 @@ public class UpdatePlanDataCycle extends IntentService {
                     tmp[3] = COLUMN_NAME_COURSEGROUP
                     tmp[4] = COLUMN_NAME_COURSE
                     tmp[5] = COLUMN_NAME_TEACHER
-                    tmp[6] = COLUMN_NAME_ROOM*/
+                    tmp[6] = COLUMN_NAME_ROOM
                 }
             }
         }
@@ -178,7 +178,7 @@ public class UpdatePlanDataCycle extends IntentService {
                     tmp[3] = COLUMN_NAME_COURSEGROUP
                     tmp[4] = COLUMN_NAME_COURSE
                     tmp[5] = COLUMN_NAME_TEACHER
-                    tmp[6] = COLUMN_NAME_ROOM*/
+                    tmp[6] = COLUMN_NAME_ROOM
                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
                     ret.add();
                 }
@@ -291,7 +291,8 @@ public class UpdatePlanDataCycle extends IntentService {
                 }
                 LayoutTomorrow.addView(tr);
             }
-        }
+        }*/
+        return null;
     }
 
 

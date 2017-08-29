@@ -8,9 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
+import android.view.View;
 
 import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.R;
+import de.createplus.vertretungsplan.settings.SettingsActivity;
 
 
 public class UpdateTimetableReceiver extends BroadcastReceiver {
@@ -26,9 +28,21 @@ public class UpdateTimetableReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String msg = intent.getExtras().getString(UpdateTimetable.Constants.EXTENDED_DATA_STATUS);
 
-        Snackbar.make(activity.findViewById(R.id.main_content), msg, Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show();
-        activity.updateContainerContent();
+        if(msg.equals("Bitte Stufe in den Einstellungen auswählen.")){
+            View.OnClickListener toSettings = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent myIntent = new Intent(activity, SettingsActivity.class);
+                    activity.startActivity(myIntent);
+                }
+            };
+
+            Snackbar.make(activity.findViewById(R.id.main_content), msg, Snackbar.LENGTH_LONG)
+                    .setAction("Einstellungen", toSettings).setDuration(20000).show();
+        }else {
+            Snackbar.make(activity.findViewById(R.id.main_content), msg, Snackbar.LENGTH_LONG)
+                    .setAction("Einstellungen", null).show();
+        }
 
         //showNotification(context, "Stundenplan Download", msg, R.drawable.ic_menu_send);
 

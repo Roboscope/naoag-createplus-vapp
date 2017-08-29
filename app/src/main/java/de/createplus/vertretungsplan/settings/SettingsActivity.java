@@ -110,7 +110,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
-        Tutorial();
+        //Tutorial();
         //setShowCase(2);
     }
 
