@@ -24,6 +24,8 @@ import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.databases.TgroupsDatabaseHelper;
 import de.createplus.vertretungsplan.databases.TplanDatabaseHelper;
 
+import static android.content.ContentValues.TAG;
+
 /**
  * Created by Max Nuglisch on 01.02.2017.
  */
@@ -64,7 +66,20 @@ public class Timetable {
 
         //get information
         level = htmlsplit[17].replace("<font size=\"5\" face=\"Arial\">","").replace("</font>","").replace(" ",""); // get level information
-        date = htmlraw.substring(htmlraw.indexOf("Periode"),htmlraw.indexOf(schoolname)); // get date information by getting string from "Periode" to the schoolname
+
+        int dateStart = htmlraw.indexOf("<td valign=\"bottom\"> <font size=\"4\" face=\"Arial\" color=\"#0000FF\"></font></td>\n" +
+                "     </tr>\n" +
+                "    </tbody>\n" +
+                "   </table>\n" +
+                "   <font size=\"3\" face=\"Arial\">");
+        int dateEnd = htmlraw.indexOf(schoolname);
+        Log.e(TAG,dateStart + ":"+dateEnd + ":" + url);
+        date = htmlraw.substring(dateStart,dateEnd); // get date information by getting string from "Periode" to the schoolname
+        //Log.e(TAG,html);
+        //System.out.println(htmlraw);
+        //Matcher m = Pattern.compile(">.+Gymnasium der Stadt Würselen").matcher(htmlraw);
+        //date = m.group();
+
 
         Whitelist wl = Whitelist.simpleText();
         wl.addTags("b");
