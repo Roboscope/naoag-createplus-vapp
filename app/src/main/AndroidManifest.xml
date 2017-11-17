@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="de.createplus.vertretungsplan">
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
 
@@ -40,6 +43,9 @@
         <service
                 android:name=".backgroundservices.UpdatePlanData"
                 android:exported="false"/>
+        <service
+            android:name=".backgroundservices.UpdatePlanDataCycle"
+            android:exported="false"/>
         <service
             android:name=".backgroundservices.UpdateTimetable"
             android:exported="false"/>

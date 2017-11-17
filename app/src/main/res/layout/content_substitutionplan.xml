@@ -38,7 +38,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
 
-        android:layout_marginBottom="57dp"><!--android:layout_below="@+id/adBanner"-->
+        android:layout_marginBottom="65dp"
+        android:layout_below="@+id/adBanner"
+        >
+
 
 
         <ExpandableListView
@@ -52,7 +55,8 @@
 
             android:cacheColorHint="#00000000"
             android:listSelector="@android:color/transparent"
-            android:transcriptMode="alwaysScroll" />
+            android:transcriptMode="alwaysScroll"
+            />
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <Button
@@ -64,7 +68,5 @@
         android:visibility="visible"
         android:layout_marginBottom="20dp"
         android:layout_marginLeft="30dp"/>
-
-
 </RelativeLayout>
 

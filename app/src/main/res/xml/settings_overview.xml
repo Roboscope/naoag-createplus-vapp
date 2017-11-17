@@ -79,10 +79,16 @@
             android:title="Startseite"
             android:summary="Die Seite die beim Starten der App geöffnet ist."/>
         <EditTextPreference
+            android:key="pref_key_scaling"
+            android:summary="Falls die Übersicht zu groß ist, kannst du dies hier ändern."
+            android:title="Größe"
+            android:inputType="number"
+            android:defaultValue="20"/>
+        <EditTextPreference
             android:defaultValue="1"
             android:key="pref_key_cheatcodes"
             android:title="Cheatcode"
-            android:summary="Gib hier einen Cheatcode ein und lass dich überraschen."/>
+            android:summary="Gib hier einen Cheatcode ein und lass dich überraschen." />
     </PreferenceCategory>
 
 

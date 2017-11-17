@@ -1,10 +1,14 @@
 package de.createplus.vertretungsplan.backgroundservices;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
@@ -14,8 +18,11 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import de.createplus.vertretungsplan.MainActivity;
 import de.createplus.vertretungsplan.R;
@@ -47,11 +54,33 @@ public class UpdatePlanDataCycle extends IntentService {
         boolean teacherMode = sharedPref.getBoolean(SettingsActivity.KEY_TEACHERMODE, false);
         if (!teacherMode) {
             if (studentPWtest()) return;
-            Log.e("VERTRETUNGSPLAN", "Updating student plan");
+            Log.e("VERTRETUNGSPLAN", "Updating subplan ---- WITH NOTIFICATIONS");
+
+            //LinkedList<String[]> knownchanges = getChanges();
+
             studentModeUpdate();
+            LinkedList<String[]> newchanges = getChanges();
+
+            //LinkedList<String[]> changes = getDiffrences(knownchanges, newchanges);
+
+            pushChangeNotifications(newchanges);
+
         }
     }
 
+    private String getHour(int hour){
+        if(hour == 1 || hour == 2)
+            return "1/2";
+        if(hour == 3 || hour == 4)
+            return "3/4";
+        if(hour == 5 || hour == 6)
+            return "5/6";
+        if(hour == 8 || hour == 9)
+            return "8/9";
+        if(hour == 10 || hour == 11)
+            return "10/11";
+        return "";
+    }
     private boolean studentPWtest() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String studentUSERNAMEPref = sharedPref.getString(SettingsActivity.KEY_STUDENT_USERNAME, "");
@@ -95,7 +124,7 @@ public class UpdatePlanDataCycle extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
-    private LinkedList<String[]> getChanges() {/*
+    private LinkedList<String[]> getChanges() {
         LinkedList<String[]> ret = new LinkedList<String[]>();
 
         MainActivity.updateDate();
@@ -122,18 +151,40 @@ public class UpdatePlanDataCycle extends IntentService {
                     tmp[3] = COLUMN_NAME_COURSEGROUP
                     tmp[4] = COLUMN_NAME_COURSE
                     tmp[5] = COLUMN_NAME_TEACHER
-                    tmp[6] = COLUMN_NAME_ROOM
+                    tmp[6] = COLUMN_NAME_ROOM*/
                 }
             }
         }
-        //System.out.println(Arrays.toString(TodayEntries));
+        System.out.println(Arrays.toString(TodayEntries));// <-------- Plan of today
+
+
+
+        String[] TomorrowEntries = new String[11];
+        for (int i = 0; i < FullTimetable.size(); i++) {
+            String[] currentItem = FullTimetable.get(i);
+            //Log.e("Day",""+Integer.parseInt(currentItem[0])+":"+TomorrowWeek);
+            if (((Integer.parseInt(currentItem[0]) % 2) != 0) == ((MainActivity.TomorrowWeek % 2) != 0)) {
+                String[] tmp = {currentItem[1], currentItem[2], currentItem[3]};
+                //Log.e("Day",""+Integer.parseInt(currentItem[1])+":"+TomorrowDay);
+                if (Integer.parseInt(currentItem[1]) == MainActivity.TomorrowDay + 1) {
+                    //Log.e("Day",""+Integer.parseInt(currentItem[1]));
+                    TomorrowEntries[Integer.parseInt(currentItem[2])] = currentItem[4] + " " + currentItem[5] + " " + currentItem[6];
+                }
+            }
+        }
+        System.out.println(Arrays.toString(TomorrowEntries));// <-------- Plan of tomorrow
+
+
+        //#####################################################################################################################
+
+
+
 
         for (int i = 1; i < TodayEntries.length; i++) {
             if (TodayEntries[i] != null) {
                 String[] tmp = TodayEntries[i].split(" ");
 
-                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(), tmp[0], MainActivity.TodayDate, i);
-
+                final LinkedList<String[]> spplan = db.getSPinfo(dbFORCLASS.getSavedClass(), tmp[0], MainActivity.TodayDate, i); // Is there a change for this lesson?
                 String[] sp = null;
                 int changetypeNotFinal = 0; // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
                 if (spplan.size() > 0) {
@@ -155,18 +206,6 @@ public class UpdatePlanDataCycle extends IntentService {
                 }
                 final int changetype = changetypeNotFinal;
 
-
-                for (int o = 0; o < tmp.length; o++) {
-                    if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
-
-                    if (changetype == 2) {
-
-                        tmp[2] = sp[4];
-                        //Log.e("setupOverview",Arrays.toString(sp));
-                    }
-
-                }
-
                 i++;
 
                 if(changetype != 0){
@@ -178,9 +217,11 @@ public class UpdatePlanDataCycle extends IntentService {
                     tmp[3] = COLUMN_NAME_COURSEGROUP
                     tmp[4] = COLUMN_NAME_COURSE
                     tmp[5] = COLUMN_NAME_TEACHER
-                    tmp[6] = COLUMN_NAME_ROOM
+                    tmp[6] = COLUMN_NAME_ROOM*/
                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
-                    ret.add();
+                    sp[0]=""+changetype;
+                    sp[2]=MainActivity.days[MainActivity.TodayDay];
+                    ret.add(concatenate(tmp,sp));
                 }
             }
 
@@ -188,24 +229,10 @@ public class UpdatePlanDataCycle extends IntentService {
 
         //----------------------------------------------------------------------------
 
-        TitleTomorrow1.setText(MainActivity.days[MainActivity.TomorrowDay] + ",");
-        TitleTomorrow2.setText(MainActivity.TomorrowDate);
+        //TitleTomorrow1.setText(MainActivity.days[MainActivity.TomorrowDay] + ",");
+        //TitleTomorrow2.setText(MainActivity.TomorrowDate);
 
 
-        String[] TomorrowEntries = new String[11];
-        for (int i = 0; i < FullTimetable.size(); i++) {
-            String[] currentItem = FullTimetable.get(i);
-            //Log.e("Day",""+Integer.parseInt(currentItem[0])+":"+TomorrowWeek);
-            if (((Integer.parseInt(currentItem[0]) % 2) != 0) == ((MainActivity.TomorrowWeek % 2) != 0)) {
-                String[] tmp = {currentItem[1], currentItem[2], currentItem[3]};
-                //Log.e("Day",""+Integer.parseInt(currentItem[1])+":"+TomorrowDay);
-                if (Integer.parseInt(currentItem[1]) == MainActivity.TomorrowDay + 1) {
-                    //Log.e("Day",""+Integer.parseInt(currentItem[1]));
-                    TomorrowEntries[Integer.parseInt(currentItem[2])] = currentItem[4] + " " + currentItem[5] + " " + currentItem[6];
-                }
-            }
-        }
-        //System.out.println(Arrays.toString(TomorrowEntries));
         //Log.e("setupOverview","-------------------------------------");
         for (int i = 1; i < TomorrowEntries.length; i++) {
 
@@ -221,8 +248,6 @@ public class UpdatePlanDataCycle extends IntentService {
                 if (spplan.size() > 0) {
                     sp = spplan.get(0);
                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
-                    Log.e("setupOverview", sp[0].replace(" ", "").toUpperCase());
-                    Log.e("setupOverview", sp[5].replace(" ", "").toUpperCase());
                     String Kind = sp[0].replace(" ", "").toUpperCase();
                     String Text = sp[5].replace(" ", "").toUpperCase();
                     if (Kind.equals("RAUM-VTR.")) {
@@ -238,62 +263,71 @@ public class UpdatePlanDataCycle extends IntentService {
                 }
                 final int changetype = changetypeNotFinal;
 
-                if ((i + 1) < TomorrowEntries.length && TomorrowEntries[i + 1] != null) {
-
-                    two.setText(i + "");
-                    tr.addView(two);
-
-                    for (int o = 0; o < tmp.length; o++) {
-                        if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
-
-                        tw.setText(tmp[o].replace(" ", ""));
-                        tr.addView(tw);
-                    }
-                } else {
-                    two.setText(i + "/" + (i + 1));
-                    tr.addView(two);
-                    for (int o = 0; o < tmp.length; o++) {
-                        if (tmp[o].equals(" ") || tmp[o].equals("")) o++;
-                        //Log.e("O", "|" + tmp[o] + "|");
-                        if (changetype == 2) {
-                            if (o == 2) {
-                                tw.setTextColor(getChangeColor(changetype));
-                                tmp[2] = sp[4];
-                                //Log.e("setupOverview",Arrays.toString(sp));
-                            }
-                        } else {
-                            tw.setTextColor(getChangeColor(changetype));
-                        }
-                        tw.setText(tmp[o].replace(" ", ""));
-
-                        tr.addView(tw);
-                    }
-                    if (changetype != 0) {
-                        LinearLayout outerLayout = new LinearLayout(this);
-                        ImageView picture = new ImageView(this);
-                        outerLayout.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onClickOverview(spplan.get(0), changetype);
-                            }
-                        });
-                        LinearLayout.LayoutParams pictureLayoutParams = new LinearLayout.LayoutParams(60, 60);
-                        picture.setImageResource(R.drawable.info_button);
-                        pictureLayoutParams.setMargins(0, 28, 10, 0);
-                        //picture.setPadding(0, 35, 10, 0);
-
-                        outerLayout.addView(picture, pictureLayoutParams);
-                        outerLayout.bringToFront();
-                        tr.addView(outerLayout);
-                    }
+                if (changetype != 0) {
+                    sp[0]=""+changetype;
+                    sp[2]= MainActivity.days[MainActivity.TomorrowDay];
+                    ret.add(concatenate(tmp,sp));
+                }
 
                     i++;
                 }
-                LayoutTomorrow.addView(tr);
+
             }
-        }*/
-        return null;
+
+        return ret;
     }
 
+    private void addNotification(String title, String text) {
+        Random random = new Random();
+        int m = random.nextInt(9999 - 1000) + 1000;
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(title)
+                        .setContentText(text);
 
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        builder.setContentIntent(contentIntent);
+
+        // Add as notification
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.notify(m, builder.build());
+    }
+
+    public <T> T[] concatenate (T[] a, T[] b) {
+        int aLen = a.length;
+        int bLen = b.length;
+
+        @SuppressWarnings("unchecked")
+        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen+bLen);
+        System.arraycopy(a, 0, c, 0, aLen);
+        System.arraycopy(b, 0, c, aLen, bLen);
+
+        return c;
+    }
+
+    public void pushChangeNotifications(LinkedList<String[]> changes){
+        for(int i = 0; i < changes.size(); i++){ // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+            String[] toView = changes.get(i);
+            String title = "";
+            String text = "";
+            if(toView[3].equals("3")){
+                title = "Entfall: " +toView[5]+" "+getHour(Integer.parseInt(toView[4]))+ " "+toView[0] + " " +toView[1];
+                text = "Info: " + toView[8];
+            }
+            else if(toView[3].equals("1")){
+                title = "Vertretung: " +toView[5]+" "+getHour(Integer.parseInt(toView[4]))+ " "+ toView[0] + " " +toView[1];
+                text = "Raum: " + toView[7];
+                if(toView[8].length()>3) text = text +" Info: " + toView[8];
+            }
+            else if(toView[3].equals("2")){
+                title = "Raumwechsel: "  +toView[5]+" "+getHour(Integer.parseInt(toView[4]))+ " "+ toView[0] + " " +toView[1];
+            }
+
+            addNotification(title, text);
+            Log.e("PUSH NOTE", Arrays.toString(changes.get(i)));
+        }
+    }
 }

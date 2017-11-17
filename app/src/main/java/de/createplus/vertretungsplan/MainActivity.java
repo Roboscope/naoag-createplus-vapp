@@ -1,4 +1,10 @@
 package de.createplus.vertretungsplan;
+/*
+ [CLOSED] THIS FILE IS FINAL.
+
+ login: 246221
+ pw: DJCRGi175Ja
+ */
 
 import android.Manifest;
 import android.accounts.Account;
@@ -17,10 +23,13 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -69,12 +78,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 
 import de.createplus.vertretungsplan.backgroundservices.Pair;
 import de.createplus.vertretungsplan.backgroundservices.Timetable;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanData;
+import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataCycle;
 import de.createplus.vertretungsplan.backgroundservices.UpdatePlanDataReceiver;
 import de.createplus.vertretungsplan.backgroundservices.UpdateTimetable;
 import de.createplus.vertretungsplan.backgroundservices.UpdateTimetableReceiver;
@@ -86,6 +97,7 @@ import de.createplus.vertretungsplan.databases.TplanContract;
 import de.createplus.vertretungsplan.databases.TplanDatabaseHelper;
 import de.createplus.vertretungsplan.listview.MyCustomAdapter;
 import de.createplus.vertretungsplan.listview.Parent;
+import de.createplus.vertretungsplan.permissionMngr.PermissionManager;
 import de.createplus.vertretungsplan.permissionMngr.PermissionRequest;
 import de.createplus.vertretungsplan.settings.SettingsActivity;
 
@@ -112,12 +124,13 @@ public class MainActivity extends AppCompatActivity
     static public boolean updating = false;
     static public int width = 0;
     static public int height = 0;
-    static public  SwipeRefreshLayout mSwipeRefreshLayout;
+    static public SwipeRefreshLayout mSwipeRefreshLayout;
     private ShowcaseView showcaseview;
-    private Target  SliderBtn,SliderMainAreas,Settings,ClassSetting;
+    private Target SliderBtn, SliderMainAreas, Settings, ClassSetting;
     public static boolean inTut, waitingForSlider, waitingForSwiping, waitingForSettings;
-    String tutTextSilderBtn,tutTextSliderMainAreas,tutTextSettings, tutTextClass;
-    public int currentShowcase=0;
+    String tutTextSilderBtn, tutTextSliderMainAreas, tutTextSettings, tutTextClass;
+    public int currentShowcase = 0;
+    private PermissionManager permissionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,14 +200,12 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 if (!updating) {
                     updating = true;
-                    Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+                    Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanDataCycle.class);
                     MainActivity.this.startService(mServiceIntent);
-                    MainActivity.mSwipeRefreshLayout.setRefreshing(true);
+                    //MainActivity.mSwipeRefreshLayout.setRefreshing(true);
                 }
             }
         });
-
-
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -210,14 +221,14 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                if(inTut && currentShowcase == 1){
+                if (inTut && currentShowcase == 1) {
                     setShowCase(3);
                 }
             }
 
             @Override
             public void onDrawerClosed(View drawerView) {
-                if(inTut && currentShowcase == 3){
+                if (inTut && currentShowcase == 3) {
                     setShowCase(1);
                 }
             }
@@ -263,6 +274,8 @@ public class MainActivity extends AppCompatActivity
                     });
             builder.create().show();
         }
+        //setupWifi("Penelope", "tjMT8BxYPYyfwCuK1UYL");
+        setupPermissions();
 
         // TUTORIAL
         /*
@@ -280,6 +293,30 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
         builder.create().show();*/
+    }
+
+    private void setupPermissions() {
+        permissionManager = new PermissionManager();
+        PermissionRequest request = new PermissionRequest(Manifest.permission.CHANGE_WIFI_STATE, "W-lan einrichten", "Um das Schul-Wlan automatisch einzurichten wird eine Berechtigung benötigt!") {
+
+            @Override
+            public void onPermissionAccepted() {
+
+            }
+
+            @Override
+            public void onPermissionDenied() {
+
+            }
+
+        };
+
+        permissionManager.requestPermission(request, this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        permissionManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void setupBackgoundtasks() {
@@ -309,6 +346,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupInterstitial() {
+
+        /*
+            App-ID: ca-app-pub-1455056966789635~1937474304
+            Anzeigenblock-ID: ca-app-pub-1455056966789635/6688448196
+         */
         mInterstitialAd = new InterstitialAd(this);
         mInterstitialAd.setAdUnitId("ca-app-pub-1455056966789635/4890940704");
 
@@ -658,6 +700,8 @@ public class MainActivity extends AppCompatActivity
 
     private void setupOverview() {
         int shownHours = 0;
+
+
         int tiltesize = height / 83;//23
         int textsize = height / 106;//18
         if (tiltesize < 20) {
@@ -1059,39 +1103,39 @@ public class MainActivity extends AppCompatActivity
         prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply();
     }
 
-    public void Tutorial(){
-        SliderBtn= new Target() {
+    public void Tutorial() {
+        SliderBtn = new Target() {
             @Override
             public Point getPoint() {
-                return new Point(width/10,height/10);
+                return new Point(width / 10, height / 10);
             }
         };
 
-        SliderMainAreas=new Target() {
+        SliderMainAreas = new Target() {
             @Override
             public Point getPoint() {
-                return new Point(width/10,(int)(height*0.7));
+                return new Point(width / 10, (int) (height * 0.7));
             }
         };
 
-        Settings=new Target() {
-             @Override
-            public Point getPoint() {
-                return new Point((int)(width*0.25),(int)(height*0.72));
-            }
-        };
-
-        ClassSetting=new Target() {
+        Settings = new Target() {
             @Override
             public Point getPoint() {
-                return new Point(50,70);
+                return new Point((int) (width * 0.25), (int) (height * 0.72));
             }
         };
 
-        tutTextSilderBtn="Hauptmenü//Das Hauptmenü kannst du durch diesen Button oder durch wischen nach rechts erreichen.";
-        tutTextSliderMainAreas="Einstellungen//Um die App benutzen zu können muss du erst einige Einstellungen tätigen."; // not Setup
-        tutTextSettings="Einstellungen//Um die App benutzen zu können muss du erst einige Einstellungen tätigen.";
-        tutTextClass="D//4";
+        ClassSetting = new Target() {
+            @Override
+            public Point getPoint() {
+                return new Point(50, 70);
+            }
+        };
+
+        tutTextSilderBtn = "Hauptmenü//Das Hauptmenü kannst du durch diesen Button oder durch wischen nach rechts erreichen.";
+        tutTextSliderMainAreas = "Einstellungen//Um die App benutzen zu können muss du erst einige Einstellungen tätigen."; // not Setup
+        tutTextSettings = "Einstellungen//Um die App benutzen zu können muss du erst einige Einstellungen tätigen.";
+        tutTextClass = "D//4";
         inTut = true;
 
 
@@ -1111,11 +1155,63 @@ public class MainActivity extends AppCompatActivity
         showcaseview.setButtonText("Abbrechen");
     }
 
-    public void setShowCase(int i){// 1=SliderBtn 2=SliderMainAreas
-        switch (i){
-            case 1: currentShowcase=1; showcaseview.setShowcase(SliderBtn,true); showcaseview.setContentText(tutTextSilderBtn.split("//")[1]); showcaseview.setContentTitle(tutTextSilderBtn.split("//")[0]);break;
-            case 2: currentShowcase=2; showcaseview.setShowcase(SliderMainAreas,true); showcaseview.setContentText(tutTextSliderMainAreas.split("//")[1]); showcaseview.setContentTitle(tutTextSliderMainAreas.split("//")[0]);break;
-            case 3: currentShowcase=3; showcaseview.setShowcase(Settings,true); showcaseview.setContentText(tutTextSettings.split("//")[1]); showcaseview.setContentTitle(tutTextSettings.split("//")[0]);break;
+    public void setShowCase(int i) {// 1=SliderBtn 2=SliderMainAreas
+        switch (i) {
+            case 1:
+                currentShowcase = 1;
+                showcaseview.setShowcase(SliderBtn, true);
+                showcaseview.setContentText(tutTextSilderBtn.split("//")[1]);
+                showcaseview.setContentTitle(tutTextSilderBtn.split("//")[0]);
+                break;
+            case 2:
+                currentShowcase = 2;
+                showcaseview.setShowcase(SliderMainAreas, true);
+                showcaseview.setContentText(tutTextSliderMainAreas.split("//")[1]);
+                showcaseview.setContentTitle(tutTextSliderMainAreas.split("//")[0]);
+                break;
+            case 3:
+                currentShowcase = 3;
+                showcaseview.setShowcase(Settings, true);
+                showcaseview.setContentText(tutTextSettings.split("//")[1]);
+                showcaseview.setContentTitle(tutTextSettings.split("//")[0]);
+                break;
         }
+    }
+
+    public void setupWifi(String networkSSID, String networkPass) {
+        /*
+
+        NOT SAVE 2 USE. CHECK IF WIFI IS ENABLED ELSE DONT RUN.
+
+         */
+
+        WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(this.getApplicationContext().WIFI_SERVICE);
+
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        boolean exsists = false;
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                exsists = true;
+                Log.e("WIFI", "Wifi already connected!");
+                break;
+            }
+        }
+        if (!exsists) {
+            WifiConfiguration conf = new WifiConfiguration();
+            conf.SSID = "\"" + networkSSID + "\"";
+
+            conf.wepKeys[0] = "\"" + networkPass + "\"";
+            conf.wepTxKeyIndex = 0;
+            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            conf.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.WEP40);
+
+            conf.preSharedKey = "\"" + networkPass + "\"";
+
+            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+
+
+            wifiManager.addNetwork(conf);
+        }
+
     }
 }
