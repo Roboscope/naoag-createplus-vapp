@@ -3,6 +3,7 @@ package de.createplus.vertretungsplan.backgroundservices;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -50,37 +51,44 @@ public class UpdatePlanDataCycle extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        //addNotification("LOL", "DID IT");
+        Log.e("VERTRETUNGSPLAN", "Updating subplan ---- WITH NOTIFICATIONS");
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean teacherMode = sharedPref.getBoolean(SettingsActivity.KEY_TEACHERMODE, false);
         if (!teacherMode) {
             if (studentPWtest()) return;
-            Log.e("VERTRETUNGSPLAN", "Updating subplan ---- WITH NOTIFICATIONS");
 
-            //LinkedList<String[]> knownchanges = getChanges();
+            LinkedList<String[]> knownchanges = getChanges();
 
             studentModeUpdate();
             LinkedList<String[]> newchanges = getChanges();
 
-            //LinkedList<String[]> changes = getDiffrences(knownchanges, newchanges);
+            LinkedList<String[]> changes = getDiffrences(knownchanges, newchanges);
 
-            pushChangeNotifications(newchanges);
+            pushChangeNotifications(changes);
+            if(MainActivity.mSwipeRefreshLayout != null){
+                MainActivity.mSwipeRefreshLayout.setRefreshing(false);
+            }
+            MainActivity.updating = false;
+
 
         }
     }
 
-    private String getHour(int hour){
-        if(hour == 1 || hour == 2)
+    private String getHour(int hour) {
+        if (hour == 1 || hour == 2)
             return "1/2";
-        if(hour == 3 || hour == 4)
+        if (hour == 3 || hour == 4)
             return "3/4";
-        if(hour == 5 || hour == 6)
+        if (hour == 5 || hour == 6)
             return "5/6";
-        if(hour == 8 || hour == 9)
+        if (hour == 8 || hour == 9)
             return "8/9";
-        if(hour == 10 || hour == 11)
+        if (hour == 10 || hour == 11)
             return "10/11";
         return "";
     }
+
     private boolean studentPWtest() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         String studentUSERNAMEPref = sharedPref.getString(SettingsActivity.KEY_STUDENT_USERNAME, "");
@@ -158,7 +166,6 @@ public class UpdatePlanDataCycle extends IntentService {
         System.out.println(Arrays.toString(TodayEntries));// <-------- Plan of today
 
 
-
         String[] TomorrowEntries = new String[11];
         for (int i = 0; i < FullTimetable.size(); i++) {
             String[] currentItem = FullTimetable.get(i);
@@ -176,8 +183,6 @@ public class UpdatePlanDataCycle extends IntentService {
 
 
         //#####################################################################################################################
-
-
 
 
         for (int i = 1; i < TodayEntries.length; i++) {
@@ -208,8 +213,8 @@ public class UpdatePlanDataCycle extends IntentService {
 
                 i++;
 
-                if(changetype != 0){
-                    String[] obj = {"1", MainActivity.days[MainActivity.TodayDay], MainActivity.TodayDate, };
+                if (changetype != 0) {
+                    String[] obj = {"1", MainActivity.days[MainActivity.TodayDay], MainActivity.TodayDate,};
 
                     /*tmp[0] = COLUMN_NAME_WEEK
                     tmp[1] = COLUMN_NAME_DAY
@@ -219,9 +224,9 @@ public class UpdatePlanDataCycle extends IntentService {
                     tmp[5] = COLUMN_NAME_TEACHER
                     tmp[6] = COLUMN_NAME_ROOM*/
                     //retin[0] = KIND; retin[1] = HOUR; retin[2] = ROOM; retin[3] = DATE; retin[4] = NEWROOM; retin[5] = TEXT;
-                    sp[0]=""+changetype;
-                    sp[2]=MainActivity.days[MainActivity.TodayDay];
-                    ret.add(concatenate(tmp,sp));
+                    sp[0] = "" + changetype;
+                    sp[2] = MainActivity.days[MainActivity.TodayDay];
+                    ret.add(concatenate(tmp, sp));
                 }
             }
 
@@ -264,15 +269,15 @@ public class UpdatePlanDataCycle extends IntentService {
                 final int changetype = changetypeNotFinal;
 
                 if (changetype != 0) {
-                    sp[0]=""+changetype;
-                    sp[2]= MainActivity.days[MainActivity.TomorrowDay];
-                    ret.add(concatenate(tmp,sp));
+                    sp[0] = "" + changetype;
+                    sp[2] = MainActivity.days[MainActivity.TomorrowDay];
+                    ret.add(concatenate(tmp, sp));
                 }
 
-                    i++;
-                }
-
+                i++;
             }
+
+        }
 
         return ret;
     }
@@ -294,40 +299,90 @@ public class UpdatePlanDataCycle extends IntentService {
         // Add as notification
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(m, builder.build());
+
+/*
+        // The id of the channel.
+        String CHANNEL_ID = "my_channel_01";
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setContentTitle(title)
+                        .setContentText(text);
+// Creates an explicit intent for an Activity in your app
+        Intent resultIntent = new Intent(this, MainActivity.class);
+
+// The stack builder object will contain an artificial back stack for the
+// started Activity.
+// This ensures that navigating backward from the Activity leads out of
+// your app to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+// Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(MainActivity.class);
+// Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(
+                        0,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+// mNotificationId is a unique integer your app uses to identify the
+// notification. For example, to cancel the notification, you can pass its ID
+// number to NotificationManager.cancel().
+        mNotificationManager.notify(12, mBuilder.build());
+
+*/
     }
 
-    public <T> T[] concatenate (T[] a, T[] b) {
+    public <T> T[] concatenate(T[] a, T[] b) {
         int aLen = a.length;
         int bLen = b.length;
 
         @SuppressWarnings("unchecked")
-        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen+bLen);
+        T[] c = (T[]) Array.newInstance(a.getClass().getComponentType(), aLen + bLen);
         System.arraycopy(a, 0, c, 0, aLen);
         System.arraycopy(b, 0, c, aLen, bLen);
 
         return c;
     }
 
-    public void pushChangeNotifications(LinkedList<String[]> changes){
-        for(int i = 0; i < changes.size(); i++){ // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
+    public void pushChangeNotifications(LinkedList<String[]> changes) {
+        for (int i = 0; i < changes.size(); i++) { // 0 = Nichts, 1 = Vertretung, 2 = Raumwechsel, 3 = Entfall, 4 = Unbekannt
             String[] toView = changes.get(i);
             String title = "";
             String text = "";
-            if(toView[3].equals("3")){
-                title = "Entfall: " +toView[5]+" "+getHour(Integer.parseInt(toView[4]))+ " "+toView[0] + " " +toView[1];
+            if (toView[3].equals("3")) {
+                title = "Entfall: " + toView[5] + " " + getHour(Integer.parseInt(toView[4])) + " " + toView[0] + " " + toView[1];
                 text = "Info: " + toView[8];
-            }
-            else if(toView[3].equals("1")){
-                title = "Vertretung: " +toView[5]+" "+getHour(Integer.parseInt(toView[4]))+ " "+ toView[0] + " " +toView[1];
+            } else if (toView[3].equals("1")) {
+                title = "Vertretung: " + toView[5] + " " + getHour(Integer.parseInt(toView[4])) + " " + toView[0] + " " + toView[1];
                 text = "Raum: " + toView[7];
-                if(toView[8].length()>3) text = text +" Info: " + toView[8];
-            }
-            else if(toView[3].equals("2")){
-                title = "Raumwechsel: "  +toView[5]+" "+getHour(Integer.parseInt(toView[4]))+ " "+ toView[0] + " " +toView[1];
+                if (toView[8].length() > 3) text = text + " Info: " + toView[8];
+            } else if (toView[3].equals("2")) {
+                title = "Raumwechsel: " + toView[5] + " " + getHour(Integer.parseInt(toView[4])) + " " + toView[0] + " " + toView[1];
             }
 
             addNotification(title, text);
             Log.e("PUSH NOTE", Arrays.toString(changes.get(i)));
         }
+        //addNotification("LOL", "DID IT");
     }
+
+    private LinkedList<String[]> getDiffrences(LinkedList<String[]> knownchanges,LinkedList<String[]> newchanges){
+        LinkedList<String[]> ret = new LinkedList<>();
+        for(int i = 0; i < newchanges.size(); i++){
+            String[] cur = newchanges.get(i);
+            for(int o = 0; o < knownchanges.size(); o++){
+                if(Arrays.toString(cur).equals(Arrays.toString(knownchanges.get(o)))){
+                    cur = null;
+                }
+            }
+            if(cur != null) ret.add(cur);
+        }
+        return ret;
+    }
+
 }

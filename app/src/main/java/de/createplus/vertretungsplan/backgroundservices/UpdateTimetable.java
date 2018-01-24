@@ -242,9 +242,10 @@ public class UpdateTimetable extends IntentService {
 
         Log.e("Update Timetable: ","Done Loading");
         Pair inSQL = db.getClassWeek();
+        Log.e("LOL","<----------------------" + inSQL.b[0]);
         int testifequal = 0;
         //Log.e("inSQL", inSQL + "");
-        if(inSQL.a[0] != null){
+        if(inSQL.a[0] != null && inSQL.b[0] != null){
             if(inSQL.a[0].equals(weekCurrent[0].replace("\"",""))){
                 //Log.e("Update Timetable","WEEK ONE IS EQUAL_TEST");
                 testifequal++;

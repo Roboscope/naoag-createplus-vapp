@@ -198,11 +198,13 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onClick(View view) {
+                Log.e("MAIN FAB", "Pressed");
                 if (!updating) {
                     updating = true;
                     Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanDataCycle.class);
                     MainActivity.this.startService(mServiceIntent);
-                    //MainActivity.mSwipeRefreshLayout.setRefreshing(true);
+                    MainActivity.mSwipeRefreshLayout.setRefreshing(true);
+
                 }
             }
         });
@@ -247,7 +249,7 @@ public class MainActivity extends AppCompatActivity
 
         if (!updating && updateSupPlan) {
             updating = true;
-            Intent UpdateIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+            Intent UpdateIntent = new Intent(MainActivity.this, UpdatePlanDataCycle.class);
             MainActivity.this.startService(UpdateIntent);
             MainActivity.mSwipeRefreshLayout.setRefreshing(true);
         }
@@ -294,6 +296,28 @@ public class MainActivity extends AppCompatActivity
                 });
         builder.create().show();*/
     }
+   /* private void setupNotificationChannel(){
+        NotificationManager mNotificationManager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+// The id of the channel.
+        String id = "Vertretungsplan_news";
+// The user-visible name of the channel.
+        CharSequence name = "Vertretungsplan";
+// The user-visible description of the channel.
+        String description = "Updates über deine Stunden.";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel mChannel = new NotificationChannel(id, name, importance);
+// Configure the notification channel.
+        mChannel.setDescription(description);
+        mChannel.enableLights(true);
+// Sets the notification light color for notifications posted to this
+// channel, if the device supports this feature.
+        mChannel.setLightColor(Color.RED);
+        mChannel.enableVibration(true);
+        mChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+        mNotificationManager.createNotificationChannel(mChannel);
+
+    }*/
 
     private void setupPermissions() {
         permissionManager = new PermissionManager();
@@ -533,7 +557,7 @@ public class MainActivity extends AppCompatActivity
                 public void onRefresh() {
                     if (!updating) {
                         updating = true;
-                        Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+                        Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanDataCycle.class);
                         MainActivity.this.startService(mServiceIntent);
                     }
                 }
@@ -566,7 +590,7 @@ public class MainActivity extends AppCompatActivity
                 public void onRefresh() {
                     if (!updating) {
                         updating = true;
-                        Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanData.class);
+                        Intent mServiceIntent = new Intent(MainActivity.this, UpdatePlanDataCycle.class);
                         MainActivity.this.startService(mServiceIntent);
                     }
                 }

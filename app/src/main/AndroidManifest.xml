@@ -40,9 +40,9 @@
 
         </activity>
 
-        <service
+        <!--service
                 android:name=".backgroundservices.UpdatePlanData"
-                android:exported="false"/>
+                android:exported="false"/-->
         <service
             android:name=".backgroundservices.UpdatePlanDataCycle"
             android:exported="false"/>

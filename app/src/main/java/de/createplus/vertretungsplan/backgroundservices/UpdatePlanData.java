@@ -32,6 +32,7 @@ public class UpdatePlanData extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Log.e("ERROR", "THIS METHOD IS OUTDATED. <---------------------");
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean teacherMode = sharedPref.getBoolean(SettingsActivity.KEY_TEACHERMODE, false);
         if (teacherMode) {
